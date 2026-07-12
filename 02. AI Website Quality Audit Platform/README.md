@@ -67,7 +67,7 @@ I engineered a hybrid solution combining **n8n orchestration** with a **custom P
 
 ## 🛠️ How to Import and Use This Workflow
 
-1. Download the `workflow.json` file from this repository folder.
+1. Download the `AI Website Quality Audit Platform.json` file from this repository folder.
 2. Open your n8n instance -> **Workflows** -> **Add Workflow**.
 3. Import the file.
 4. **Prerequisites:** You will need your own Supabase instance, Google Workspace credentials, Groq API key, and the Hugging Face hosted Playwright microservice endpoint to run this end-to-end.
