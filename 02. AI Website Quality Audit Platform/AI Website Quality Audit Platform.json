@@ -1,0 +1,789 @@
+{
+  "name": "AI Website Quality Audit Platform",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "QA Exploratory tester",
+        "formDescription": "Audit your website within minutes !!!",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Enter Your Name/Company Name",
+              "placeholder": "John Doe / Yendigital",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Enter the website url ",
+              "placeholder": "https://automationexercise.com/",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Enter your email Address",
+              "placeholder": "john.doe@yendigital.com",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "dd011336-d470-4d40-b090-8d5249d5c288",
+      "name": "On form submission",
+      "webhookId": "92efc6de-4b4e-46f2-bc1a-b5a3ee4e0759"
+    },
+    {
+      "parameters": {
+        "tableId": "Website status",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Scan ID",
+              "fieldValue": "={{ $json.scanId }}"
+            },
+            {
+              "fieldId": "Website URL",
+              "fieldValue": "={{ $json.url }}"
+            },
+            {
+              "fieldId": "Status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "Created_AT",
+              "fieldValue": "={{ $json.createdAt }}"
+            },
+            {
+              "fieldId": "Name/ Company Name",
+              "fieldValue": "={{ $('On form submission').item.json['Enter Your Name/Company Name'] }}"
+            },
+            {
+              "fieldId": "Send to",
+              "fieldValue": "={{ $('On form submission').item.json['Enter your email Address'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        608,
+        0
+      ],
+      "id": "1c1fcc06-da5e-4d4a-9621-2cf4a89dedf1",
+      "name": "Add in Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "J5tJMzMKL9EinVt9",
+          "name": "fkpathan88 n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n1-qa-browser-agent.hf.space/start-scan",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"scanId\": \"{{ $('Add in Supabase').item.json['Scan ID'] }}\",\n  \"url\": \"{{ $('Add in Supabase').item.json['Website URL'] }}\"\n}",
+        "options": {
+          "timeout": 1000000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -48,
+        368
+      ],
+      "id": "c1c78a9b-106a-4ec0-93c9-4dc1cbdcd597",
+      "name": "Run Exploratory Test"
+    },
+    {
+      "parameters": {
+        "url": "=https://n8n1-qa-browser-agent.hf.space/screenshots-list/{{ $('Run Exploratory Test').item.json.scanId }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        256,
+        368
+      ],
+      "id": "a7041f56-9951-484f-9a03-ca6bc9d55859",
+      "name": "Get URL's of Screenshots"
+    },
+    {
+      "parameters": {
+        "jsCode": "const scanId = $('Run Exploratory Test').first().json.scanId;\n// ↑ yahan apne scan result node ka naam lagana hai\n// jahan se scanId aa raha hai.\n\nconst files = $json.files;\n\nreturn files.map(file => ({\n  json: {\n    scanId,\n    fileName: file,\n    screenshotUrl:\n      `https://n8n1-qa-browser-agent.hf.space/screenshots/${scanId}/${file}`\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        368
+      ],
+      "id": "53693400-b931-4b4c-8acd-39cc948d2d19",
+      "name": "Split each item"
+    },
+    {
+      "parameters": {
+        "url": "={{$json.screenshotUrl}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        608,
+        368
+      ],
+      "id": "54a09b38-f0f6-46f3-b957-62c3741f1f3a",
+      "name": "Download Each binary image"
+    },
+    {
+      "parameters": {
+        "operation": "compress",
+        "binaryPropertyName": "={{ Object.keys($binary).join(',') }}",
+        "fileName": "=QA_Browser_Agent_Report_{{ $('Assign a Scan ID').item.json.scanId }}.zip"
+      },
+      "type": "n8n-nodes-base.compression",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        592
+      ],
+      "id": "fd5f4d65-8371-418e-8c7f-b6126855f8e1",
+      "name": "Compression"
+    },
+    {
+      "parameters": {
+        "jsCode": "const report = $('Run Exploratory Test').first().json.reportPayload;\n\nconst pages = report.pages || [];\n\n// ---------- Health Score ----------\nlet score = 100;\n\nscore -= (report.scanSummary?.critical || 0) * 25;\nscore -= (report.scanSummary?.high || 0) * 10;\nscore -= (report.scanSummary?.medium || 0) * 1;\nscore -= (report.scanSummary?.low || 0) * 0.5;\n\nscore = Math.max(0, Math.round(score));\n\n// ---------- Performance ----------\nconst totalLoadTime = pages.reduce(\n  (sum, p) => sum + (p.loadTimeMs || 0),\n  0\n);\n\nconst averageLoadTime =\n  pages.length > 0\n    ? Math.round(totalLoadTime / pages.length)\n    : 0;\n\nconst slowPages = pages\n  .filter(p => p.performanceIssue)\n  .map(p => ({\n    url: p.url,\n    loadTimeMs: p.loadTimeMs\n  }));\n\n// ---------- Accessibility ----------\nconst accessibilityIssueCount = pages.reduce(\n  (sum, p) =>\n    sum + (p.accessibilityIssues?.length || 0),\n  0\n);\n\nconst imagesWithoutAltCount = pages.reduce(\n  (sum, p) =>\n    sum + (p.imagesWithoutAlt?.length || 0),\n  0\n);\n\n// ---------- Forms ----------\nconst brokenFormsCount = pages.reduce(\n  (sum, p) =>\n    sum + (p.brokenForms?.length || 0),\n  0\n);\n\n// ---------- Most Affected Pages ----------\nconst topAffectedPages = [...pages]\n  .map(page => ({\n    url: page.url,\n    severity: page.overallSeverity,\n    issuesCount:\n      (page.severitySummary?.critical || 0) +\n      (page.severitySummary?.high || 0) +\n      (page.severitySummary?.medium || 0) +\n      (page.severitySummary?.low || 0)\n  }))\n  .sort((a, b) => b.issuesCount - a.issuesCount)\n  .slice(0, 5);\n\n// ---------- AI Payload ----------\nreturn [{\n  json: {\n    websiteUrl: report.websiteUrl,\n    scanDate: report.scanDate,\n\n    healthScore: score,\n\n    scanSummary: report.scanSummary,\n\n    averageLoadTime,\n    slowPages,\n\n    accessibilityIssueCount,\n    imagesWithoutAltCount,\n    brokenFormsCount,\n\n    topAffectedPages,\n\n    pages: pages.map(page => ({\n      url: page.url,\n      severity: page.overallSeverity,\n\n      issuesCount:\n        (page.severitySummary?.critical || 0) +\n        (page.severitySummary?.high || 0) +\n        (page.severitySummary?.medium || 0) +\n        (page.severitySummary?.low || 0),\n\n      findings:\n        page.findings\n          ?.slice(0, 5)\n          .map(f => f.type) || []\n    }))\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        864
+      ],
+      "id": "7d6b2709-6e0a-44df-9015-c57d43d6e6d8",
+      "name": "Extract only reportPayload"
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = {\n  json: { ...$input.first().json },\n  binary: {}\n};\n\nfor (const item of $input.all()) {\n  if (!item.binary) continue;\n\n  for (const key of Object.keys(item.binary)) {\n    const file = item.binary[key];\n\n    const fileName =\n      file.fileName?.replace(/[^a-zA-Z0-9_.-]/g, '_') ||\n      `file_${Date.now()}`;\n\n    output.binary[fileName] = file;\n  }\n}\n\nreturn [output];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        592
+      ],
+      "id": "426949a0-333e-40c4-b68f-794c061bd379",
+      "name": "Combine all Binary files"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        832,
+        288
+      ],
+      "id": "928e6892-c2d4-46d3-a72b-0195a4abfe60",
+      "name": "Merge Report and Images"
+    },
+    {
+      "parameters": {
+        "jsCode": "const url = $input.first().json['Enter the website url '].trim();\n\nif (!/^https?:\\/\\/.+/i.test(url)) {\n  throw new Error('Please enter a valid URL starting with http:// or https://');\n}\n\nreturn {\n  url\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        0
+      ],
+      "id": "b56bb0d4-03e7-4686-90e5-4c802bd14f11",
+      "name": "Check url"
+    },
+    {
+      "parameters": {
+        "jsCode": "const scanId = Date.now().toString();\n\nreturn {\n  scanId,\n  url: $input.item.json.url,\n  status: 'PENDING',\n  createdAt: new Date().toISOString()\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        0
+      ],
+      "id": "35e94a97-b575-459c-b907-6da1404f7c46",
+      "name": "Assign a Scan ID"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f9c2f543-d397-4426-96ab-a4892e98d33a",
+              "name": "={\n  \"success\": true,\n  \"message\": \"Scan has been queued successfully.\",\n  \"scanId\": \"{{ $json['Scan ID'] }}\",\n  \"status\": \"{{ $json.Status }}\"\n}",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        0
+      ],
+      "id": "109debe2-72e9-436e-a9c6-9ae16f69ebde",
+      "name": "Status "
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Website Scan Report:\n\n{{ JSON.stringify($json, null, 2) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a Senior QA Consultant preparing a client-facing executive website testing report.\n\nAnalyze the provided website scan JSON and return ONLY a valid JSON object that strictly matches the required output schema.\n\n\nDetermine healthStatus using the following mapping:\n\n90-100 = Excellent\n70-89 = Good\n50-69 = Fair\n0-49 = Needs Attention\n\nThis is the ONLY value you are allowed to derive from the input data.\nAll other metrics must be used exactly as provided.\n\nRULES:\n\n1. Return ONLY valid JSON.\n2. Do NOT return Markdown.\n3. Do NOT return code blocks.\n4. Do NOT add any fields outside the schema.\n5. Populate every required field.\n6. ONLY use information explicitly present in the input JSON.\n7. NEVER assume or invent:\n   - Security issues\n   - SEO issues\n   - Accessibility issues\n   - Performance issues\n   - Root causes\n   - Revenue impact\n   - Technologies used\n8. Never use speculative words such as:\n   - likely\n   - probably\n   - appears\n   - suggests\n   - may indicate\n9. Use all provided metrics exactly as they are.\n10. Do not calculate any scores, percentages, or metrics except healthStatus and totalIssues.\n11. Use the provided healthScore and healthStatus values directly.\n12. If information is unavailable:\n    - For string fields use:\n      \"Not enough data to determine.\"\n    - For arrays use:\n      []\n13. Business impacts and recommendations must remain generic and be based only on the scan findings.\n\nSpecial Rules:\n\n- If accessibilityIssueCount = 0 AND imagesWithoutAltCount = 0:\n  accessibilityFindings =\n  \"No accessibility issues were detected during this scan.\"\n\n- If slowPages is empty:\n  performanceFindings =\n  \"No slow-performing pages were detected during this scan.\"\n\n- Use topAffectedPages exactly as provided.\n\nReturn ONLY the JSON object matching the schema."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        400,
+        864
+      ],
+      "id": "1c2460bb-b814-4595-ad3b-4193e5247e9d",
+      "name": "Create an AI summary"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"websiteInformation\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"websiteUrl\": {\n          \"type\": \"string\"\n        },\n        \"scanDate\": {\n          \"type\": \"string\"\n        },\n        \"pagesScanned\": {\n          \"type\": \"number\"\n        }\n      },\n      \"required\": [\n        \"websiteUrl\",\n        \"scanDate\",\n        \"pagesScanned\"\n      ]\n    },\n    \"overallWebsiteHealth\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"healthScore\": {\n          \"type\": \"number\"\n        },\n        \"healthStatus\": {\n          \"type\": \"string\"\n        }\n      },\n      \"required\": [\n        \"healthScore\",\n        \"healthStatus\"\n      ]\n    },\n    \"issueBreakdown\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"totalIssues\": {\n          \"type\": \"number\"\n        },\n        \"critical\": {\n          \"type\": \"number\"\n        },\n        \"high\": {\n          \"type\": \"number\"\n        },\n        \"medium\": {\n          \"type\": \"number\"\n        },\n        \"low\": {\n          \"type\": \"number\"\n        },\n        \"pagesWithIssues\": {\n          \"type\": \"number\"\n        }\n      },\n      \"required\": [\n        \"totalIssues\",\n        \"critical\",\n        \"high\",\n        \"medium\",\n        \"low\",\n        \"pagesWithIssues\"\n      ]\n    },\n    \"mostAffectedPages\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"url\": {\n            \"type\": \"string\"\n          },\n          \"issuesCount\": {\n            \"type\": \"number\"\n          }\n        },\n        \"required\": [\n          \"url\",\n          \"issuesCount\"\n        ]\n      }\n    },\n    \"accessibilityFindings\": {\n      \"type\": \"string\"\n    },\n    \"performanceFindings\": {\n      \"type\": \"string\"\n    },\n    \"businessImpact\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    },\n    \"recommendedActions\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    },\n    \"priorityRoadmap\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"immediate\": {\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": \"string\"\n          }\n        },\n        \"shortTerm\": {\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": \"string\"\n          }\n        },\n        \"longTerm\": {\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": \"string\"\n          }\n        }\n      },\n      \"required\": [\n        \"immediate\",\n        \"shortTerm\",\n        \"longTerm\"\n      ]\n    },\n    \"conclusion\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"websiteInformation\",\n    \"overallWebsiteHealth\",\n    \"issueBreakdown\",\n    \"mostAffectedPages\",\n    \"accessibilityFindings\",\n    \"performanceFindings\",\n    \"businessImpact\",\n    \"recommendedActions\",\n    \"priorityRoadmap\",\n    \"conclusion\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        1072
+      ],
+      "id": "889b16d9-d03a-4e49-a4cf-912be25131f8",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json['Enter your email Address'] }}",
+        "subject": "=Automated Website Testing Report - {{ $('On form submission').item.json['Enter the website url '] }}",
+        "emailType": "text",
+        "message": "=Hi {{ $('On form submission').item.json['Enter Your Name/Company Name'] }},\n\nYour automated website quality assurance scan has been completed successfully.\n\nSummary:\n• Website: {{ $('On form submission').item.json['Enter the website url '] }}\n• Health Score: {{ $('Create an AI summary').first().json.output.overallWebsiteHealth.healthScore }}/100\n• Status: Needs Attention\n• Pages Scanned: {{ $('Create an AI summary').first().json.output.websiteInformation.pagesScanned }}\n• Total Issues Found: {{ $('Create an AI summary').first().json.output.issueBreakdown.totalIssues }}\n\nAttachments Included:\n1. Executive_Summary.html\n   → Management-friendly overview and recommendations.\n\n2. QA_Browser_Agent_Report_{{ $('Assign a Scan ID').item.json.scanId }}.zip\n   → Google drive link : {{ $('Upload file').item.json.webViewLink }}\nPlease review the findings and recommendations in the attached reports.\n\nRegards,\nQA Browser Agent\nAutomated Website Testing Platform",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "executiveReport"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1296,
+        736
+      ],
+      "id": "78481eb6-089f-4560-b53f-feab91eff878",
+      "name": "Send a message",
+      "webhookId": "c338185b-b83b-4c1b-a0c3-f2dd331337d1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "krCk4116zPzFafB3",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const report = $json.output;\n\nconst html = `\n<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n\n<link\nhref=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css\"\nrel=\"stylesheet\">\n\n<style>\nbody{\n  background:#f4f7fb;\n  font-family:Inter,Arial,sans-serif;\n  color:#1f2937;\n}\n\n.header{\n  background:linear-gradient(135deg,#1e3a8a,#2563eb);\n  color:white;\n  padding:40px;\n  border-radius:20px;\n  margin-bottom:30px;\n}\n\n.card{\n  border:none;\n  border-radius:18px;\n  box-shadow:0 3px 15px rgba(0,0,0,.08);\n}\n\n.metric{\n  text-align:center;\n  padding:20px;\n}\n\n.metric h2{\n  margin:0;\n  font-weight:700;\n}\n\n.section-title{\n  font-weight:700;\n  margin-bottom:20px;\n  color:#1e3a8a;\n}\n\n.badge-health{\n  font-size:16px;\n  padding:10px 20px;\n}\n\nul{\n  padding-left:20px;\n}\n\n.footer{\n  text-align:center;\n  color:#6b7280;\n  margin-top:50px;\n  font-size:13px;\n}\n</style>\n</head>\n\n<body>\n\n<div class=\"container py-5\">\n\n<div class=\"header\">\n  <h1>Executive Quality Assurance Summary</h1>\n  <p class=\"mb-0\">\n    Generated by QA Browser Agent\n  </p>\n</div>\n\n<div class=\"card p-4 mb-4\">\n  <h3 class=\"section-title\">\n    Website Information\n  </h3>\n\n  <p><b>Website:</b> ${report.websiteInformation.websiteUrl}</p>\n  <p><b>Scan Date:</b> ${new Date(report.websiteInformation.scanDate).toLocaleString()}</p>\n  <p><b>Pages Scanned:</b> ${report.websiteInformation.pagesScanned}</p>\n</div>\n\n<div class=\"card p-4 mb-4\">\n\n  <h3 class=\"section-title\">\n    Overall Website Health\n  </h3>\n\n  <div class=\"row\">\n\n    <div class=\"col-md-6\">\n      <div class=\"metric\">\n        <h2>\n          ${report.overallWebsiteHealth.healthScore}/100\n        </h2>\n\n        <p>Health Score</p>\n      </div>\n    </div>\n\n    <div class=\"col-md-6\">\n      <div class=\"metric\">\n        <span class=\"badge bg-primary badge-health\">\n          ${report.overallWebsiteHealth.healthStatus}\n        </span>\n      </div>\n    </div>\n\n  </div>\n</div>\n\n<div class=\"card p-4 mb-4\">\n\n<h3 class=\"section-title\">\nIssue Breakdown\n</h3>\n\n<div class=\"row text-center\">\n\n<div class=\"col\">\n<h3>${report.issueBreakdown.critical}</h3>\n<p>Critical</p>\n</div>\n\n<div class=\"col\">\n<h3>${report.issueBreakdown.high}</h3>\n<p>High</p>\n</div>\n\n<div class=\"col\">\n<h3>${report.issueBreakdown.medium}</h3>\n<p>Medium</p>\n</div>\n\n<div class=\"col\">\n<h3>${report.issueBreakdown.low}</h3>\n<p>Low</p>\n</div>\n\n</div>\n\n</div>\n\n<div class=\"card p-4 mb-4\">\n\n<h3 class=\"section-title\">\nMost Affected Pages\n</h3>\n\n<table class=\"table\">\n\n<thead>\n<tr>\n<th>URL</th>\n<th>Issues</th>\n</tr>\n</thead>\n\n<tbody>\n\n${report.mostAffectedPages.map(page=>`\n<tr>\n<td>${page.url}</td>\n<td>${page.issuesCount}</td>\n</tr>\n`).join('')}\n\n</tbody>\n\n</table>\n\n</div>\n\n<div class=\"card p-4 mb-4\">\n<h3 class=\"section-title\">\nAccessibility Findings\n</h3>\n\n<p>\n${report.accessibilityFindings}\n</p>\n</div>\n\n<div class=\"card p-4 mb-4\">\n<h3 class=\"section-title\">\nPerformance Findings\n</h3>\n\n<p>\n${report.performanceFindings}\n</p>\n</div>\n\n<div class=\"card p-4 mb-4\">\n<h3 class=\"section-title\">\nBusiness Impact\n</h3>\n\n<ul>\n${report.businessImpact.map(i=>`<li>${i}</li>`).join('')}\n</ul>\n\n</div>\n\n<div class=\"card p-4 mb-4\">\n<h3 class=\"section-title\">\nRecommended Actions\n</h3>\n\n<ul>\n${report.recommendedActions.map(i=>`<li>${i}</li>`).join('')}\n</ul>\n\n</div>\n\n<div class=\"card p-4 mb-4\">\n\n<h3 class=\"section-title\">\nPriority Roadmap\n</h3>\n\n<h5>Immediate</h5>\n<ul>\n${report.priorityRoadmap.immediate.map(i=>`<li>${i}</li>`).join('')}\n</ul>\n\n<h5>Short-Term</h5>\n<ul>\n${report.priorityRoadmap.shortTerm.map(i=>`<li>${i}</li>`).join('')}\n</ul>\n\n<h5>Long-Term</h5>\n<ul>\n${report.priorityRoadmap.longTerm.map(i=>`<li>${i}</li>`).join('')}\n</ul>\n\n</div>\n\n<div class=\"card p-4\">\n\n<h3 class=\"section-title\">\nConclusion\n</h3>\n\n<p>\n${report.conclusion}\n</p>\n\n</div>\n\n<div class=\"footer\">\nGenerated automatically by QA Browser Agent\n</div>\n\n</div>\n\n</body>\n</html>\n`;\n\nreturn [{\n  json:{},\n  binary:{\n    executiveReport: await this.helpers.prepareBinaryData(\n      Buffer.from(html),\n      'Executive_Summary.html',\n      'text/html'\n    )\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        864
+      ],
+      "id": "246567e3-da19-421b-98d9-882c576a2169",
+      "name": "Generate AI Summary report"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1088,
+        736
+      ],
+      "id": "0c2228d9-3c9d-4607-b48f-c36fcd27b09a",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        384,
+        1104
+      ],
+      "id": "b88d0526-2c60-4a49-b988-806edbc27903",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "crXbdGFtjAtsmqZg",
+          "name": "1990.faizkhan@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawData = items[0].json;\n\n// Safe Data Normalization: Extracting data properly from the nested JSON\nconst data = {\n    websiteUrl: rawData.url || (rawData.reportPayload && rawData.reportPayload.websiteUrl) || \"Unknown URL\",\n    scanDate: (rawData.reportPayload && rawData.reportPayload.scanDate) || new Date().toISOString(),\n    scanSummary: rawData.scanSummary || (rawData.reportPayload && rawData.reportPayload.scanSummary) || { totalPages: 0, critical: 0, high: 0, medium: 0, low: 0 },\n    pages: (rawData.reportPayload && rawData.reportPayload.pages) || rawData.inventory || []\n};\n\n// Safe stringify for injecting data into the client-side script\nconst reportDataJSON = JSON.stringify(data).replace(/</g, '\\\\u003c');\n\nconst html = `\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Advanced UI Scan Report - ${data.websiteUrl}</title>\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <script src=\"https://cdn.jsdelivr.net/npm/chart.js\"></script>\n    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css\" rel=\"stylesheet\">\n    <style>\n        .details-row { display: none; }\n        .details-row.active { display: table-row; }\n        .badge { padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 0.75rem; color: white; }\n        .bg-critical { background-color: #ef4444; }\n        .bg-high { background-color: #f97316; }\n        .bg-medium { background-color: #eab308; }\n        .bg-low { background-color: #3b82f6; }\n    </style>\n</head>\n<body class=\"bg-slate-50 text-slate-800 font-sans antialiased\">\n    \n    <nav class=\"bg-indigo-600 text-white p-4 shadow-lg flex justify-between items-center\">\n        <div>\n            <h1 class=\"text-2xl font-bold\"><i class=\"fa-solid fa-shield-halved mr-2\"></i> Security & Quality Deep Audit</h1>\n            <a href=\"${data.websiteUrl}\" target=\"_blank\" class=\"text-indigo-200 hover:text-white underline text-sm\"><i class=\"fa-solid fa-link mr-1\"></i>${data.websiteUrl}</a>\n        </div>\n        <div class=\"text-right\">\n            <p class=\"text-sm text-indigo-200\">Scan Date</p>\n            <p class=\"font-bold\">${new Date(data.scanDate).toLocaleString()}</p>\n        </div>\n    </nav>\n\n    <div class=\"max-w-7xl mx-auto p-6\">\n        \n        <div class=\"grid grid-cols-1 md:grid-cols-5 gap-4 mb-8\">\n            <div id=\"card-all\" onclick=\"filterBySeverity('all')\" class=\"bg-white p-4 rounded-xl shadow-sm border-l-4 border-indigo-500 cursor-pointer hover:shadow-md transition-all ring-2 ring-indigo-600 bg-indigo-50/50\">\n                <h3 class=\"text-gray-500 text-xs font-semibold uppercase\">Total Pages Scanned</h3>\n                <p class=\"text-3xl font-bold mt-1 text-indigo-600\">${data.scanSummary.totalPages || data.pages.length}</p>\n                <span class=\"text-xs text-slate-400\">Click to clear filters</span>\n            </div>\n            <div id=\"card-critical\" onclick=\"filterBySeverity('critical')\" class=\"bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-500 cursor-pointer hover:shadow-md transition-all\">\n                <h3 class=\"text-gray-500 text-xs font-semibold uppercase\">Critical Issues</h3>\n                <p class=\"text-3xl font-bold mt-1 text-red-500\">${data.scanSummary.critical || 0}</p>\n                <span class=\"text-xs text-slate-400\">Click to filter</span>\n            </div>\n            <div id=\"card-high\" onclick=\"filterBySeverity('high')\" class=\"bg-white p-4 rounded-xl shadow-sm border-l-4 border-orange-500 cursor-pointer hover:shadow-md transition-all\">\n                <h3 class=\"text-gray-500 text-xs font-semibold uppercase\">High Issues</h3>\n                <p class=\"text-3xl font-bold mt-1 text-orange-500\">${data.scanSummary.high || 0}</p>\n                <span class=\"text-xs text-slate-400\">Click to filter</span>\n            </div>\n            <div id=\"card-medium\" onclick=\"filterBySeverity('medium')\" class=\"bg-white p-4 rounded-xl shadow-sm border-l-4 border-yellow-500 cursor-pointer hover:shadow-md transition-all\">\n                <h3 class=\"text-gray-500 text-xs font-semibold uppercase\">Medium Issues</h3>\n                <p class=\"text-3xl font-bold mt-1 text-yellow-600\">${data.scanSummary.medium || 0}</p>\n                <span class=\"text-xs text-slate-400\">Click to filter</span>\n            </div>\n            <div id=\"card-low\" onclick=\"filterBySeverity('low')\" class=\"bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 cursor-pointer hover:shadow-md transition-all\">\n                <h3 class=\"text-gray-500 text-xs font-semibold uppercase\">Low Issues</h3>\n                <p class=\"text-3xl font-bold mt-1 text-blue-500\">${data.scanSummary.low || 0}</p>\n                <span class=\"text-xs text-slate-400\">Click to filter</span>\n            </div>\n        </div>\n\n        <div class=\"grid grid-cols-1 md:grid-cols-2 gap-8 mb-8\">\n            <div class=\"bg-white p-6 rounded-xl shadow-sm border border-gray-100\">\n                <h2 class=\"text-lg font-bold mb-4 text-center\"><i class=\"fa-solid fa-chart-pie mr-2\"></i>Severity Distribution</h2>\n                <div class=\"relative h-64 w-full flex justify-center\">\n                    <canvas id=\"severityPieChart\"></canvas>\n                </div>\n            </div>\n            <div class=\"bg-white p-6 rounded-xl shadow-sm border border-gray-100\">\n                <h2 class=\"text-lg font-bold mb-4 text-center\"><i class=\"fa-solid fa-chart-bar mr-2\"></i>Issues Per Page (Top 10)</h2>\n                <div class=\"relative h-64 w-full\">\n                    <canvas id=\"issuesBarChart\"></canvas>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden\">\n            <div class=\"p-4 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4\">\n                <h2 class=\"text-xl font-bold\"><i class=\"fa-solid fa-list mr-2\"></i>Detailed Page Analysis <span id=\"activeFilterBadge\" class=\"hidden text-xs bg-indigo-100 text-indigo-800 ml-2 px-2.5 py-0.5 rounded-full font-semibold\"></span></h2>\n                \n                <div class=\"relative w-full sm:w-72\">\n                    <span class=\"absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400\">\n                        <i class=\"fa-solid fa-magnifying-glass\"></i>\n                    </span>\n                    <input type=\"text\" id=\"tableSearch\" onkeyup=\"handleSearch()\" class=\"w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-sm\" placeholder=\"Search pages or URLs...\">\n                </div>\n            </div>\n\n            <div class=\"overflow-x-auto\">\n                <table class=\"w-full text-left border-collapse\">\n                    <thead>\n                        <tr class=\"bg-gray-100 text-gray-600 uppercase text-sm select-none\">\n                            <th class=\"p-4 font-semibold cursor-pointer hover:bg-gray-200 transition-colors\" onclick=\"sortTable(0, 'text')\">Page Title <i class=\"fa-solid fa-sort text-xs ml-1 text-slate-400\"></i></th>\n                            <th class=\"p-4 font-semibold cursor-pointer hover:bg-gray-200 transition-colors\" onclick=\"sortTable(1, 'number')\">Load Time <i class=\"fa-solid fa-sort text-xs ml-1 text-slate-400\"></i></th>\n                            <th class=\"p-4 font-semibold cursor-pointer hover:bg-gray-200 transition-colors\" onclick=\"sortTable(2, 'number')\">Issues <i class=\"fa-solid fa-sort text-xs ml-1 text-slate-400\"></i></th>\n                            <th class=\"p-4 font-semibold cursor-pointer hover:bg-gray-200 transition-colors\" onclick=\"sortTable(3, 'severity')\">Severity <i class=\"fa-solid fa-sort text-xs ml-1 text-slate-400\"></i></th>\n                            <th class=\"p-4 font-semibold text-center\">Action</th>\n                        </tr>\n                    </thead>\n                    <tbody id=\"analysisTableBody\">\n                        </tbody>\n                </table>\n            </div>\n\n            <div class=\"p-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center\">\n                <span id=\"paginationInfo\" class=\"text-sm text-gray-600\">Showing 1 to 10 of 0 entries</span>\n                <div class=\"flex gap-2\">\n                    <button id=\"btnPrev\" onclick=\"changePage(-1)\" class=\"px-3 py-1 bg-white border border-gray-300 rounded text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed\">Previous</button>\n                    <button id=\"btnNext\" onclick=\"changePage(1)\" class=\"px-3 py-1 bg-white border border-gray-300 rounded text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed\">Next</button>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div id=\"screenshotModal\" class=\"fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex justify-center items-center p-4 shadow-2xl\" onclick=\"closeScreenshotModal()\">\n        <div class=\"relative max-w-5xl max-h-[90vh] bg-white rounded-xl overflow-hidden p-2\" onclick=\"event.stopPropagation()\">\n            <button class=\"absolute top-4 right-4 bg-slate-800/80 hover:bg-slate-700 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl transition-colors z-10 shadow\" onclick=\"closeScreenshotModal()\">&times;</button>\n            <img id=\"modalImage\" src=\"\" class=\"max-w-full max-h-[85vh] object-contain rounded-lg\" alt=\"Maximized view\">\n        </div>\n    </div>\n\n    <script>\n        const reportData = ${reportDataJSON};\n        \n        let filteredPages = [...reportData.pages];\n        let activeSeverityFilter = 'all';\n        let searchQuery = '';\n        \n        let currentPage = 1;\n        const itemsPerPage = 10;\n\n        // Render the advanced checklist matrix state\n        function getMatrixStatusHTML(title, issuesList, detailsContent = \"\") {\n            const passed = !issuesList || issuesList.length === 0;\n            return \\`\n                <div class=\"p-3 bg-white rounded-lg border \\${passed ? 'border-green-100' : 'border-red-100'} shadow-sm\">\n                    <div class=\"flex items-center justify-between font-bold text-sm mb-1\">\n                        <span class=\"text-gray-700\">\\${title}</span>\n                        <span>\n                            \\${passed ? \n                                '<span class=\"text-green-600\"><i class=\"fa-solid fa-circle-check mr-1\"></i>Passed</span>' : \n                                '<span class=\"text-red-500\"><i class=\"fa-solid fa-circle-xmark mr-1\"></i>Issues Found</span>'\n                            }\n                        </span>\n                    </div>\n                    \\${!passed ? \\`<div class=\"mt-2 text-xs text-gray-600 bg-slate-50 p-2 rounded max-h-32 overflow-y-auto\">\\${detailsContent || issuesList.map(i => typeof i === 'string' ? i : (i.message || i.issue || JSON.stringify(i))).join('<br/>')}</div>\\` : ''}\n                </div>\n            \\`;\n        }\n\n        function renderTable() {\n            const tbody = document.getElementById(\"analysisTableBody\");\n            tbody.innerHTML = \"\";\n\n            const totalItems = filteredPages.length;\n            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;\n            if (currentPage > totalPages) currentPage = totalPages;\n            \n            const start = (currentPage - 1) * itemsPerPage;\n            const end = Math.min(start + itemsPerPage, totalItems);\n\n            const pageItems = filteredPages.slice(start, end);\n\n            if (pageItems.length === 0) {\n                tbody.innerHTML = \\`<tr><td colspan=\"5\" class=\"p-8 text-center text-gray-500 italic\">No matching URLs found.</td></tr>\\`;\n                document.getElementById(\"paginationInfo\").textContent = \"Showing 0 to 0 of 0 entries\";\n                document.getElementById(\"btnPrev\").disabled = true;\n                document.getElementById(\"btnNext\").disabled = true;\n                return;\n            }\n\n            pageItems.forEach((page, localIndex) => {\n                const globalIndex = start + localIndex;\n                const d = page.details || {};\n                \n                // Build Matrix Parameters Components\n                const mixedContentHTML = getMatrixStatusHTML(\"Mixed Content\", d.mixedContent);\n                const accessibilityHTML = getMatrixStatusHTML(\"Accessibility\", d.accessibilityIssues, d.accessibilityIssues ? d.accessibilityIssues.map(i => \\`Tag: \\${i.tag} | Type: \\${i.type || 'N/A'} | Placeholder: \\${i.placeholder || 'N/A'}\\`).join('<br/>') : \"\");\n                const h1HTML = getMatrixStatusHTML(\"Heading Architecture\", d.h1Issues);\n                const titleHTML = getMatrixStatusHTML(\"Page Title Audit\", d.titleIssues);\n                const brokenFormsHTML = getMatrixStatusHTML(\"Broken Forms Integrity\", d.brokenForms, d.brokenForms ? d.brokenForms.map(f => \\`Form index \\${f.formIndex}: \\${f.issues.join(', ')}\\`).join('<br/>') : \"\");\n                const brokenLinksHTML = getMatrixStatusHTML(\"Broken Links Status\", d.brokenLinks, d.brokenLinks ? d.brokenLinks.map(l => \\`URL: \\${l.url} Status: \\${l.status}\\`).join('<br/>') : \"\");\n                const brokenImagesHTML = getMatrixStatusHTML(\"Broken Images Checks\", d.brokenImages);\n                const jsErrorsHTML = getMatrixStatusHTML(\"JavaScript Engine\", d.jsErrors, d.jsErrors ? d.jsErrors.map(e => \\`\\${e.message} \\${e.stack || ''}\\`).join('<br/>') : \"\");\n                const consoleHTML = getMatrixStatusHTML(\"Dev Console Runtime\", d.consoleErrors);\n                const networkFailuresHTML = getMatrixStatusHTML(\"Failed Endpoints API\", d.failedRequests, d.failedRequests ? d.failedRequests.map(r => \\`Failed: \\${r.url} - Error: \\${r.error}\\`).join('<br/>') : \"\");\n                \n                // Form findings validation errors block parsing\n                let findingsHTML = '<div><p class=\"text-xs text-slate-400 italic\">No finding structural errors</p></div>';\n                if (d.findings && d.findings.length > 0) {\n                    findingsHTML = \\`\n                        <div class=\"bg-white p-3 rounded shadow-sm border border-orange-100 max-h-64 overflow-y-auto\">\n                            \\${d.findings.map(f => \\`\n                                <div class=\"mb-3 border-b border-gray-100 pb-2 last:mb-0 last:border-0 last:pb-0\">\n                                    <span class=\"inline-block bg-orange-100 text-orange-800 text-[10px] px-2 py-0.5 rounded font-bold uppercase mb-1\">\\${f.type}</span>\n                                    \\${f.error ? \\`<p class=\"text-xs font-mono bg-red-50 p-1.5 rounded break-all text-red-700 mt-1\">\\${f.error.substring(0, 300)}\\${f.error.length > 300 ? '...' : ''}</p>\\` : ''}\n                                    \\${f.validationMessages ? f.validationMessages.map(vm => \\`<p class=\"text-xs text-gray-700 font-medium mt-1\">&#8226; \\${vm.name || 'Field'}: \\${vm.message}</p>\\`).join('') : ''}\n                                </div>\n                            \\`).join('')}\n                        </div>\n                    \\`;\n                }\n\n                tbody.innerHTML += \\`\n                    <tr class=\"border-b hover:bg-gray-50 transition-colors\">\n                        <td class=\"p-4 max-w-xs truncate\">\n                            <span class=\"font-medium block text-slate-900 text-sm\">\\${page.title || 'Untitled Page'}</span>\n                            <a href=\"\\${page.url}\" target=\"_blank\" class=\"text-blue-500 text-xs hover:underline break-all\"><i class=\"fa-solid fa-arrow-up-right-from-square mr-1 text-[10px]\"></i>\\${page.url}</a>\n                        </td>\n                        <td class=\"p-4 text-sm text-gray-600\">\\${page.loadTimeMs ? page.loadTimeMs + ' ms' : 'N/A'}</td>\n                        <td class=\"p-4\"><span class=\"bg-slate-200 text-slate-800 py-1 px-3 rounded-full text-xs font-bold\">\\${page.issuesCount || 0}</span></td>\n                        <td class=\"p-4\">\n                            <span class=\"badge bg-\\${page.severity || 'low'} uppercase\">\\${page.severity || 'N/A'}</span>\n                        </td>\n                        <td class=\"p-4 text-center\">\n                            <button onclick=\"toggleDetails(\\${globalIndex})\" class=\"bg-indigo-100 text-indigo-700 hover:bg-indigo-200 py-1 px-3 rounded text-sm transition-colors font-medium\">\n                                <i id=\"icon-\\${globalIndex}\" class=\"fa-solid fa-chevron-down mr-1\"></i> View Audit\n                            </button>\n                        </td>\n                    </tr>\n                    <tr id=\"details-\\${globalIndex}\" class=\"details-row bg-slate-100 border-b\">\n                        <td colspan=\"5\" class=\"p-6\">\n                            <div class=\"mb-4 bg-indigo-50 border-l-4 border-indigo-500 p-3 rounded-r-lg\">\n                                <h4 class=\"font-bold text-indigo-900 text-sm\"><i class=\"fa-solid fa-square-poll-vertical mr-1\"></i> Comprehensive Audit Verification Matrix Dashboard</h4>\n                            </div>\n                            <div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6\">\n                                \\${mixedContentHTML}\n                                \\${accessibilityHTML}\n                                \\${h1HTML}\n                                \\${titleHTML}\n                                \\${brokenFormsHTML}\n                                \\${brokenLinksHTML}\n                                \\${brokenImagesHTML}\n                                \\${jsErrorsHTML}\n                                \\${consoleHTML}\n                                \\${networkFailuresHTML}\n                            </div>\n                            \n                            <div class=\"grid grid-cols-1 lg:grid-cols-3 gap-6 border-t border-gray-300 pt-6 mt-2\">\n                                <div class=\"lg:col-span-2\">\n                                    <h4 class=\"font-bold text-orange-600 text-sm mb-2\"><i class=\"fa-solid fa-bug mr-1\"></i> Extended Assertions Engine Findings</h4>\n                                    \\${findingsHTML}\n                                </div>\n                                <div>\n                                    <h4 class=\"font-bold text-gray-700 text-sm mb-2\"><i class=\"fa-solid fa-image mr-1\"></i> Visual Target Snapshot</h4>\n                                    <div class=\"bg-white p-3 rounded border border-gray-200 flex flex-col items-center justify-center min-h-[150px]\">\n                                        \\${page.screenshotPath || page.screenshot || page.screenshotUrl ? \\`\n                                            <img src=\"\\${page.screenshotPath ? page.screenshotPath.split('/').pop() : (page.screenshot || page.screenshotUrl)}\" class=\"max-h-40 rounded cursor-pointer border border-gray-200 shadow-sm hover:opacity-80 hover:scale-[1.01] transition-all\" onclick=\"openScreenshotModal('\\${page.screenshotPath ? page.screenshotPath.split('/').pop() : (page.screenshot || page.screenshotUrl)}')\">\n                                            <span class=\"text-[11px] text-slate-400 mt-2\"><i class=\"fa-solid fa-magnifying-glass-plus mr-1\"></i>Click to expand viewport</span>\n                                        \\` : \\`\n                                            <i class=\"fa-solid fa-image-notch text-slate-300 text-3xl mb-1\"></i>\n                                            <p class=\"text-xs text-gray-400\">No screen buffer available</p>\n                                        \\`}\n                                    </div>\n                                </div>\n                            </div>\n                        </td>\n                    </tr>\n                \\`;\n            });\n\n            // Update footer controls\n            document.getElementById(\"paginationInfo\").textContent = \\`Showing \\${start + 1} to \\${end} of \\${totalItems} entries\\`;\n            document.getElementById(\"btnPrev\").disabled = (currentPage === 1);\n            document.getElementById(\"btnNext\").disabled = (currentPage === totalPages);\n        }\n\n        function toggleDetails(index) {\n            const row = document.getElementById('details-' + index);\n            const icon = document.getElementById('icon-' + index);\n            row.classList.toggle('active');\n            if(row.classList.contains('active')) {\n                icon.classList.replace('fa-chevron-down', 'fa-chevron-up');\n            } else {\n                icon.classList.replace('fa-chevron-up', 'fa-chevron-down');\n            }\n        }\n\n        function changePage(direction) {\n            currentPage += direction;\n            renderTable();\n        }\n\n        function handleSearch() {\n            searchQuery = document.getElementById(\"tableSearch\").value.toLowerCase();\n            applyFilters();\n        }\n\n        function filterBySeverity(severity) {\n            activeSeverityFilter = severity;\n            \n            // Highlight visual effect\n            ['all', 'critical', 'high', 'medium', 'low'].forEach(s => {\n                const el = document.getElementById('card-' + s);\n                if(s === severity) {\n                    el.classList.add('ring-2', 'ring-indigo-600', 'bg-indigo-50/50');\n                } else {\n                    el.classList.remove('ring-2', 'ring-indigo-600', 'bg-indigo-50/50');\n                }\n            });\n\n            const badge = document.getElementById(\"activeFilterBadge\");\n            if(severity !== 'all') {\n                badge.textContent = \"Filtered to: \" + severity.toUpperCase();\n                badge.classList.remove('hidden');\n            } else {\n                badge.classList.add('hidden');\n            }\n\n            applyFilters();\n        }\n\n        function applyFilters() {\n            filteredPages = reportData.pages.filter(page => {\n                const matchesSeverity = (activeSeverityFilter === 'all' || page.severity === activeSeverityFilter);\n                const targetText = \\`\\${page.title || ''} \\${page.url || ''}\\`.toLowerCase();\n                const matchesSearch = targetText.includes(searchQuery);\n                return matchesSeverity && matchesSearch;\n            });\n            currentPage = 1;\n            renderTable();\n        }\n\n        let sortDirections = {};\n        function sortTable(colIndex, type) {\n            sortDirections[colIndex] = !sortDirections[colIndex];\n            const isAsc = sortDirections[colIndex];\n            \n            filteredPages.sort((a, b) => {\n                let cellA = colIndex === 0 ? (a.title || '') : colIndex === 1 ? (a.loadTimeMs || 0) : colIndex === 2 ? (a.issuesCount || 0) : (a.severity || '');\n                let cellB = colIndex === 0 ? (b.title || '') : colIndex === 1 ? (b.loadTimeMs || 0) : colIndex === 2 ? (b.issuesCount || 0) : (b.severity || '');\n                \n                if (type === 'number') {\n                    return isAsc ? cellA - cellB : cellB - cellA;\n                } else if (type === 'severity') {\n                    const weights = { critical: 4, high: 3, medium: 2, low: 1 };\n                    let wA = weights[String(cellA).toLowerCase()] || 0;\n                    let wB = weights[String(cellB).toLowerCase()] || 0;\n                    return isAsc ? wA - wB : wB - wA;\n                } else {\n                    return isAsc ? String(cellA).localeCompare(String(cellB)) : String(cellB).localeCompare(String(cellA));\n                }\n            });\n            renderTable();\n        }\n\n        function openScreenshotModal(src) {\n            document.getElementById('modalImage').src = src;\n            document.getElementById('screenshotModal').classList.remove('hidden');\n        }\n        function closeScreenshotModal() {\n            document.getElementById('screenshotModal').classList.add('hidden');\n        }\n\n        window.addEventListener('DOMContentLoaded', () => {\n            renderTable();\n            \n            const pieCtx = document.getElementById('severityPieChart').getContext('2d');\n            new Chart(pieCtx, {\n                type: 'doughnut',\n                data: {\n                    labels: ['Critical', 'High', 'Medium', 'Low'],\n                    datasets: [{\n                        data: [\n                            reportData.scanSummary.critical || 0, \n                            reportData.scanSummary.high || 0, \n                            reportData.scanSummary.medium || 0, \n                            reportData.scanSummary.low || 0\n                        ],\n                        backgroundColor: ['#ef4444', '#f97316', '#eab308', '#3b82f6'],\n                        borderWidth: 0\n                    }]\n                },\n                options: {\n                    responsive: true,\n                    maintainAspectRatio: false,\n                    plugins: { legend: { position: 'bottom' } },\n                    cutout: '70%'\n                }\n            });\n\n            const sortedPages = [...reportData.pages].sort((a, b) => (b.issuesCount || 0) - (a.issuesCount || 0)).slice(0, 10);\n            const barLabels = sortedPages.map(p => {\n                const urlParts = p.url ? p.url.replace(/\\\\/$/, '').split('/') : ['Unknown'];\n                return urlParts[urlParts.length - 1] || 'Home';\n            });\n            const barData = sortedPages.map(p => p.issuesCount || 0);\n\n            const barCtx = document.getElementById('issuesBarChart').getContext('2d');\n            new Chart(barCtx, {\n                type: 'bar',\n                data: {\n                    labels: barLabels,\n                    datasets: [{\n                        label: 'Issue Count',\n                        data: barData,\n                        backgroundColor: '#6366f1',\n                        borderRadius: 4\n                    }]\n                },\n                options: {\n                    responsive: true,\n                    maintainAspectRatio: false,\n                    plugins: { legend: { display: false } },\n                    scales: {\n                        y: { beginAtZero: true, ticks: { stepSize: 1 } },\n                        x: { ticks: { maxRotation: 45, minRotation: 45 } }\n                    }\n                }\n            });\n        });\n    </script>\n</body>\n</html>\n`;\n\nconst buffer = Buffer.from(html, 'utf8');\nreturn [{\n    json: { \n        message: \"Report successfully generated!\",\n        url: data.websiteUrl\n    },\n    binary: {\n        report: {\n            data: buffer.toString('base64'),\n            mimeType: 'text/html',\n            fileName: 'Automation_Scan_Report.html'\n        }\n    }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        192
+      ],
+      "id": "a0f6ee2a-f98f-470d-8726-aba271a9d8c4",
+      "name": "HTML report"
+    },
+    {
+      "parameters": {
+        "name": "=QA_Browser_Agent_Report_{{ $('Assign a Scan ID').item.json.scanId }}.zip",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1m-OndbFhnB7vdoxPMifJEGR0-ManBKoW",
+          "mode": "list",
+          "cachedResultName": "QA Browser Agent Reports",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1m-OndbFhnB7vdoxPMifJEGR0-ManBKoW"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        624,
+        592
+      ],
+      "id": "76cdbd5e-a07f-49fd-b9e9-0c89c9ef3063",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "FvFS7an4iuPbv0Xf",
+          "name": "1990.faizkhan@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "writer",
+            "type": "user",
+            "emailAddress": "={{ $('On form submission').item.json['Enter your email Address'] }}"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        784,
+        592
+      ],
+      "id": "79e301ba-bddd-43ed-9b47-21c203a0b51b",
+      "name": "Share file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "FvFS7an4iuPbv0Xf",
+          "name": "1990.faizkhan@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "Website status",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Scan ID",
+              "condition": "eq",
+              "keyValue": "={{ $('Add in Supabase').item.json['Scan ID'] }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Status",
+              "fieldValue": "Completed"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        736
+      ],
+      "id": "01c3b761-3fe6-46a9-a9b2-3a9e70430116",
+      "name": "Update Status of the Task",
+      "credentials": {
+        "supabaseApi": {
+          "id": "J5tJMzMKL9EinVt9",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n1-qa-browser-agent.hf.space/cleanup",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"scanId\": \"{{ $json['Scan ID'].toString() }}\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1696,
+        736
+      ],
+      "id": "c19740c6-0538-43a7-ba07-31c6d7821d1b",
+      "name": "Delete the Screenshot folder in HF"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Check url",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add in Supabase": {
+      "main": [
+        [
+          {
+            "node": "Status ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Exploratory Test": {
+      "main": [
+        [
+          {
+            "node": "Extract only reportPayload",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get URL's of Screenshots",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTML report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get URL's of Screenshots": {
+      "main": [
+        [
+          {
+            "node": "Split each item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split each item": {
+      "main": [
+        [
+          {
+            "node": "Download Each binary image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Each binary image": {
+      "main": [
+        [
+          {
+            "node": "Merge Report and Images",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Compression": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract only reportPayload": {
+      "main": [
+        [
+          {
+            "node": "Create an AI summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine all Binary files": {
+      "main": [
+        [
+          {
+            "node": "Compression",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Report and Images": {
+      "main": [
+        [
+          {
+            "node": "Combine all Binary files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check url": {
+      "main": [
+        [
+          {
+            "node": "Assign a Scan ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign a Scan ID": {
+      "main": [
+        [
+          {
+            "node": "Add in Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status ": {
+      "main": [
+        [
+          {
+            "node": "Run Exploratory Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Create an AI summary",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an AI summary": {
+      "main": [
+        [
+          {
+            "node": "Generate AI Summary report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate AI Summary report": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Create an AI summary",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML report": {
+      "main": [
+        [
+          {
+            "node": "Merge Report and Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Share file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share file": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Update Status of the Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status of the Task": {
+      "main": [
+        [
+          {
+            "node": "Delete the Screenshot folder in HF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "5uhR8jsGQusP7TE3",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "9b722240-2965-4ddc-84dc-3e4d08fe6b46",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0cf0dc80c3169b41c4db0feb12776101bd90001bb95a998560efa2765e00d7a1"
+  },
+  "nodeGroups": [],
+  "id": "MCSpgivAZVapEquY",
+  "tags": []
+}
