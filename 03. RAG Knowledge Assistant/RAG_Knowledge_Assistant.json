@@ -1,0 +1,393 @@
+{
+  "name": "RAG Knowledge Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        200,
+        220
+      ],
+      "name": "When chat message received",
+      "id": "c0003c64-a756-43a8-b6bb-a5454897b911",
+      "webhookId": "e29ce256-6ab3-49ca-98ac-876ebac932f7"
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        480,
+        400
+      ],
+      "name": "Groq Chat Model",
+      "id": "e3604cc7-d6e1-4073-bf6c-0b018f2f7ddb",
+      "credentials": {
+        "groqApi": {
+          "id": "c283c174-a304-4e3e-9338-7b2ba5654c54",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a formal and professional AI assistant.\n\nYou will receive context in the form of internal documentation, product information, and support tickets. You must answer user queries **strictly based on the provided context**.\n\nRules:\n- You have access to a tool called `Company_knowledge_Base` to search documents. you MUST Always use it for each and every query when answering questions.\n- ONLY use the information present in the provided context.\n- Do NOT use external knowledge or make assumptions.\n- If a section title, heading, or metadata is present in the context, you may mention it where appropriate to improve clarity.\n- If the provided context does not fully answer the user’s query, respond clearly:\n    - \"I do not have that information based on the provided context.\"\n    - \"That information is not available in the provided data.\"\n    - \"I cannot provide an answer as the necessary details are missing from the context.\"\n- Maintain a formal, clear, and professional tone suitable for both internal team members and customers.\n- Present responses in a structured manner when appropriate (lists, bullet points, step-by-step explanations).\n- When summarizing or quoting, preserve the exact meaning and intent of the original source.\n- Always Mention the source of information with document name and para number, line number or section for every response of query.\n- If the context contains conflicting information, state this and do not take sides or make unsupported conclusions.\n\nIMPORTANT: If it is not explicitly mentioned in the context, you must state that you do not know it.\n\n\"Note: In our organization, 'staff' includes employees, contractors, and interns. Whenever the user query for norms, policies or rules about employee, provide him respose for Staffs as well. All queries related to employees MUST include staffs as well. \n\nYour goal is to help users accurately retrieve information from the provided documents, product information, and support content — and to communicate transparently when information is not available.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        520,
+        220
+      ],
+      "name": "AI Agent",
+      "id": "d0d8db60-3926-43e4-ba03-2cba77395fbc",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "Company_knowledge_Base",
+        "toolDescription": "This node retrieves the top matching documents from the Qdrant Collection vector index based on the user's query. It is used as a knowledge retrieval tool for the AI agent, helping it access relevant information from the company knowledge base such as HR policies, guidelines, or internal FAQs.",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "10JCyq8xovLpwoWOS-Txd4_Lp0PK-GNtd",
+          "mode": "list",
+          "cachedResultName": "10JCyq8xovLpwoWOS-Txd4_Lp0PK-GNtd"
+        },
+        "topK": 23,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        440
+      ],
+      "name": "Qdrant Vector Store",
+      "id": "42f6d2e9-b13e-441a-9917-071c3e94e544",
+      "credentials": {
+        "qdrantApi": {
+          "id": "bceb2d46-c9a3-4f80-b9c2-0a5b8b18c714",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "intfloat/multilingual-e5-large",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsHuggingFaceInference",
+      "typeVersion": 1,
+      "position": [
+        640,
+        600
+      ],
+      "name": "Embeddings HuggingFace Inference",
+      "id": "f125bfde-5a54-439c-b156-17afd9e4cbb6",
+      "credentials": {
+        "huggingFaceApi": {
+          "id": "0ce06ea9-2970-4ee5-9349-d0972f28edbf",
+          "name": "HuggingFaceApi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1EDeKaafrtB1zB6MYxDDhCIFB2dx3SUr4",
+          "mode": "list",
+          "cachedResultName": "Prognose RAG",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1EDeKaafrtB1zB6MYxDDhCIFB2dx3SUr4"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -740,
+        220
+      ],
+      "name": "Google Drive Trigger1",
+      "id": "6882507c-bc77-422c-851d-6a3a8a2c79b8",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "a4fedbd7-994b-498a-ab23-834cb9bf25ce",
+          "name": "Personal Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -520,
+        220
+      ],
+      "name": "Google Drive1",
+      "id": "07cc29d3-d43a-45e6-baf7-5bde138c33d3",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "a4fedbd7-994b-498a-ab23-834cb9bf25ce",
+          "name": "Personal Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "file",
+                "value": "={{ $('Google Drive Trigger1').item.json.name }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        480
+      ],
+      "name": "Default Data Loader1",
+      "id": "78351789-e078-495b-bdc8-e095bb8483e9"
+    },
+    {
+      "parameters": {
+        "chunkSize": 512,
+        "chunkOverlap": 100,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        660
+      ],
+      "name": "Recursive Character Text Splitter1",
+      "id": "fe41fdca-4445-43e8-ab34-c00e1096c7ab"
+    },
+    {
+      "parameters": {
+        "modelName": "intfloat/multilingual-e5-large",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsHuggingFaceInference",
+      "typeVersion": 1,
+      "position": [
+        -440,
+        500
+      ],
+      "name": "Embeddings HuggingFace Inference1",
+      "id": "f5e9a17f-92b6-44ec-a629-b406c4265336",
+      "credentials": {
+        "huggingFaceApi": {
+          "id": "0ce06ea9-2970-4ee5-9349-d0972f28edbf",
+          "name": "HuggingFaceApi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "10JCyq8xovLpwoWOS-Txd4_Lp0PK-GNtd",
+          "mode": "list",
+          "cachedResultName": "10JCyq8xovLpwoWOS-Txd4_Lp0PK-GNtd"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        -300,
+        220
+      ],
+      "name": "Qdrant Vector Store1",
+      "id": "ea0fb80a-bf29-4f71-af59-6c773133b904",
+      "credentials": {
+        "qdrantApi": {
+          "id": "bceb2d46-c9a3-4f80-b9c2-0a5b8b18c714",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Update Knowledge Base",
+        "height": 720,
+        "width": 900
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -820,
+        100
+      ],
+      "typeVersion": 1,
+      "id": "c3e67bfa-4331-424a-b1ac-07dbb9cc8411",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## RAG Agent\n",
+        "height": 720,
+        "width": 820,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        100,
+        100
+      ],
+      "typeVersion": 1,
+      "id": "0b5548d1-0c26-4e3a-9119-da3c6909ad1b",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings HuggingFace Inference": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings HuggingFace Inference1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7cb13ed8-28cf-4d04-a96e-68fc0f6539f4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7ab7ff7991194668e2b3f3e7b8ac5e937735c5d9b375d5778eaaf8af314a2bb6"
+  },
+  "id": "Z8IKqPQHONgqksi5",
+  "tags": []
+}
