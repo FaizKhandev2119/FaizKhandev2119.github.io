@@ -1,0 +1,621 @@
+{
+  "name": "Lead Generation & AI Outreach Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Lead Generator",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Niche",
+              "placeholder": "Dentist",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Location",
+              "placeholder": "Texas",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Country",
+              "placeholder": "USA",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Max Leads",
+              "fieldType": "number",
+              "placeholder": "1 - 15",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6d2d4ad3-cd4a-49d4-a818-a0833ed6d247",
+      "name": "On form submission",
+      "webhookId": "fc16e33c-14b1-4724-80d9-d5e9302a0f7a"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://lead-generator-nfef.onrender.com/scrape",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"Niche\": \"={{ $json.Niche }}\",\n  \"Location\": \"={{ $json.Location }}\",\n  \"Country\": \"={{ $json.Country }}\",\n  \"Max_Leads\": {{ $json['Max Leads'] }}\n}",
+        "options": {
+          "timeout": 10000000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "9fbad9b6-6838-4b52-8a37-88c6046004ae",
+      "name": "Lead Generator"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        16,
+        448
+      ],
+      "typeVersion": 1,
+      "id": "2a1bcccf-c187-46d7-8015-31af102f9ed9",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "03KTD9fBH3ZZEAwf",
+          "name": "fkpathan88@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0906e21a-0958-433e-b400-8694915ef3c9",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.Website }}",
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        656,
+        0
+      ],
+      "typeVersion": 2.2,
+      "id": "bce36e48-9bf0-4369-a7bf-2f3dfe0b9acd"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "0601f2d2-2522-471e-9e11-29498a47e19a",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              },
+              "leftValue": "={{ $json.output['Email Address'] }}",
+              "rightValue": "@"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        352,
+        272
+      ],
+      "typeVersion": 2.2,
+      "id": "f6d47fb6-3e26-4331-aac6-9a7d0cd6c91f"
+    },
+    {
+      "parameters": {},
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        560,
+        400
+      ],
+      "typeVersion": 1,
+      "id": "ae39c0f3-0287-411d-a641-9bdd25a8cd70"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Wait').item.json['Email Address'] }}",
+        "subject": "={{ $('Information Extractor1').item.json.output['Mail Subject'] }}",
+        "emailType": "text",
+        "message": "={{ $('Information Extractor1').item.json.output['Mail Body'] }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "maxTries": 2,
+      "position": [
+        864,
+        784
+      ],
+      "executeOnce": false,
+      "retryOnFail": false,
+      "typeVersion": 2.1,
+      "id": "32f00a34-262c-4ee8-bed7-e7bc47e534b6",
+      "webhookId": "6715650c-b43c-4b85-976e-a0169a5d86b1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "krCk4116zPzFafB3",
+          "name": "Gmail account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        0,
+        768
+      ],
+      "notesInFlow": false,
+      "typeVersion": 3,
+      "id": "0fd10593-c26d-47ab-9582-ca1c8205feb1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        272,
+        784
+      ],
+      "typeVersion": 1.1,
+      "id": "34ebfc0b-62dd-457f-b2cf-5f48a17223a8",
+      "webhookId": "c334dc4d-b1bb-4984-b9b2-055143505c04"
+    },
+    {
+      "parameters": {
+        "text": "=Website: {{ $json.Website }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Email Address",
+              "description": "=find out the best only one email address from the website after scraping the website. The mail address have to be in ideal format.",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.1,
+      "position": [
+        32,
+        272
+      ],
+      "id": "36077788-1834-40cf-99ce-719c25abcd3b",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "3d858728-9285-45d6-a8a2-ae32a33e9426",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "text": "=You are a perfect cold mail generator for a Digital Marketing Company, named SURYA UDAY and your name is Aslam Khan.\n\nHere's the Information about the Recipient:\n\nCompany Name: {{ $json['Company Name'] }}\nBusiness Type: {{ $json.Category }}\n\nEmail Style / Email Tune : Formal\n\nThe Email style is given just to understand how the mail will be.\n\nInstructions:\n\n1. Always start with giving a greting to the Company like Hi Company Name,\n2. Always use We not I.\n3. Mail have to be professional, Clean and to the point\n4. At last give a Signature Like:\n   Aslam Khan,\n   Surya Uday\n    \n   ",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Mail Subject",
+              "description": "=Eye Catchy mail Subject for the cold mail.",
+              "required": true
+            },
+            {
+              "name": "Mail Body",
+              "description": "=body message of the mail, perfect and clear cold mail from {{ $('On form submission').item.json['Enter Your Company Name'] }}, {{ $('On form submission').item.json['Enter your Bussiness Category'] }} with your company name as {{ $('On form submission').item.json['Enter Your Company Name'] }}",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.1,
+      "position": [
+        528,
+        784
+      ],
+      "id": "a54ca2f0-baf2-4646-a6bb-f8995226011a",
+      "name": "Information Extractor1"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        544,
+        944
+      ],
+      "id": "e9b3fc08-239d-4e66-9f2b-0b06e092bf1e",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "GfQb8mi6mlgoyWrY",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "Lead Table",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Company Name",
+              "fieldValue": "={{ $('Filter').item.json.Title }}"
+            },
+            {
+              "fieldId": "Category",
+              "fieldValue": "={{ $('Filter').item.json.Category }}"
+            },
+            {
+              "fieldId": "Website",
+              "fieldValue": "={{ $('Filter').item.json.Website }}"
+            },
+            {
+              "fieldId": "Phone Number",
+              "fieldValue": "={{ $('Filter').item.json.Phone }}"
+            },
+            {
+              "fieldId": "Email Address",
+              "fieldValue": "={{ $json.output['Email Address'] }}"
+            },
+            {
+              "fieldId": "Address",
+              "fieldValue": "={{ $('Filter').item.json.Address }}"
+            },
+            {
+              "fieldId": "Cold Mail Status"
+            },
+            {
+              "fieldId": "SEND Time"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        672,
+        256
+      ],
+      "id": "451a395d-ed52-4ab9-bf28-15cb2d5041a9",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "J5tJMzMKL9EinVt9",
+          "name": "fkpathan88 n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "Lead Table",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Company Name",
+              "condition": "eq",
+              "keyValue": "={{ $('Create a row').item.json['Company Name'] }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Cold Mail Status",
+              "fieldValue": "SENT"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        784
+      ],
+      "id": "02a7bd5f-56d8-422e-ba9d-3e214eea50a1",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "J5tJMzMKL9EinVt9",
+          "name": "fkpathan88 n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Python + Playwright Script extracts the Leads and is filtered if it has no websites\n",
+        "height": 256,
+        "width": 672
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        144,
+        -112
+      ],
+      "typeVersion": 1,
+      "id": "32121b27-20f3-4521-a013-caa14e43cddd",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Extract Email from the website, Filter out leads with no emails, save all the details in SUPABASE table\n",
+        "height": 432,
+        "width": 880,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -16,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "071471a1-4976-4228-81fe-a5afa853de55",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## A loop is initiated, A cold Email Subject and Body is prepared with signature and instructions, and is sent to the Lead's email. Then the Status is updated in Supabase Table\n",
+        "height": 528,
+        "width": 1360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -16,
+        608
+      ],
+      "typeVersion": 1,
+      "id": "1058cea0-1142-449a-a957-ceb32d6ec327",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Lead Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Generator": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0f5c925d-034e-45c3-831f-dbb1b08d06f8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0cf0dc80c3169b41c4db0feb12776101bd90001bb95a998560efa2765e00d7a1"
+  },
+  "nodeGroups": [],
+  "id": "fnqWOpBoXOrgkdba",
+  "tags": []
+}
