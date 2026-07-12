@@ -1,0 +1,2917 @@
+{
+  "name": "AI Shorts Video Generation Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Create Stories from User Input\n",
+        "height": 1060,
+        "width": 780
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note",
+      "id": "44d672e8-7759-439d-895f-5cffb70a0596"
+    },
+    {
+      "parameters": {
+        "formTitle": "KEYAAN : The ultimate AI Shorts Maker",
+        "formDescription": "Generate AI short videos of your choice !\n\"The Power is in the eye of the BEHOLDER\"",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Theme/Title",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Preferred Language",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Hindi"
+                  },
+                  {
+                    "option": "English"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Preferred Style",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Cartoon"
+                  },
+                  {
+                    "option": "3D Cartoon"
+                  },
+                  {
+                    "option": "Pixar"
+                  },
+                  {
+                    "option": "3D Pixar"
+                  },
+                  {
+                    "option": "Realistic"
+                  },
+                  {
+                    "option": "Digital Art"
+                  },
+                  {
+                    "option": "Anime"
+                  },
+                  {
+                    "option": "3D Render"
+                  },
+                  {
+                    "option": "Fantasy Illustration"
+                  },
+                  {
+                    "option": "Pixel Art"
+                  },
+                  {
+                    "option": "Watercolor"
+                  },
+                  {
+                    "option": "Sketch"
+                  },
+                  {
+                    "option": "Cyberpunk"
+                  },
+                  {
+                    "option": "Film Still"
+                  },
+                  {
+                    "option": "Highly scaled miniature diorama"
+                  },
+                  {
+                    "option": "Low Poly"
+                  },
+                  {
+                    "option": "Flat Design"
+                  },
+                  {
+                    "option": "Isometric Art"
+                  },
+                  {
+                    "option": "Beautiful Ghibli style illustration"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Preferred Story Teller Voice",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Male"
+                  },
+                  {
+                    "option": "Female"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Choose what you want?",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Character consistency ( For Stories with human characters )"
+                  },
+                  {
+                    "option": "Elemental videos ( For Stories with no humans, Best for animal stories and motivational stories )"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Format",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Long Videos"
+                  },
+                  {
+                    "option": "Shorts/Reels"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Image Generator",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Flux"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -860,
+        460
+      ],
+      "name": "On form submission",
+      "id": "050968ca-31da-47b5-88cd-3a3d1eaff232",
+      "webhookId": "32e6dec6-3c81-4915-953a-998807f734a7"
+    },
+    {
+      "parameters": {
+        "content": "## Combine All Shorts to 1 video\n",
+        "height": 360,
+        "width": 1860,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        40,
+        2080
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note1",
+      "id": "c5f98c8b-cba2-4dac-8ab8-2791b70e041a"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('On form submission').item.json['Theme/Title'] }}",
+        "options": {
+          "systemMessage": "=You are an expert **TikTok Short Video Director** and a talented **Story Writer**.  \nYou specialize in creating **short, engaging stories** broken into **{{ $('Edit Fields1').item.json.scenes }} scenes**, perfect for visual storytelling.\n\nYou have deep knowledge of pacing, visuals, and maintaining theme and character consistency.\n\n---\n\n**TASK:**  \nGenerate a story based on the following user-provided theme/idea: \"{{ $('On form submission').item.json['Theme/Title'] }}\".\nEvery story must have an interesting hook and a powerful ending.\n\n---\n\n**LANGUAGE:**  \nGenerate the story script strictly in the user-selected language \"{{ $('On form submission').item.json['Preferred Language'] }}\".\n\n---\nDIALOGUE RULE (IMPORTANT):  \n- Do NOT include any kind of quotes (single or double) around character dialogues in `scene_text`.\n- If a character is speaking, just write the sentence naturally without surrounding it with quotation marks.\n- Avoid unescaped quotes completely to ensure valid JSON.\n---\n**VISUAL STYLE:**  \nApply this consistent visual style to all image prompts: \"{{ $('On form submission').item.json['Preferred Style'] }}\".  \nEnsure all image prompts explicitly include and match this style and are family-friendly, safe for work.\n\n---\n\n**NUMBER HANDLING:**  \nIn all scene_text, if any number appears, write it in **words** (translated in the selected language), never as digits.\n\n---\n\n**SCENE TIMING:**  \nEach scene must represent **{{ $('Edit Fields1').item.json.Seconds }} seconds** of screen time. Scene_text should be **short and concise**, aligned with this pacing.\n\n---\n\n**CHARACTER PROFILE HANDLING:**  \nBefore generating the scenes, define a `\"character_profiles\"` array. Each character must have:\n\n- `name`,  \n- `gender`,  \n- `age`,  \n- `skin_color`,  \n- `eye_color`,  \n- `hair_color`,  \n- `hairstyle`,  \n- `body_type`,  \n- `clothing`,  \n- `accessories`,  \n- `vibe`.\n\nYou MUST reuse these character profiles in the story consistently.\n\n---\n**IMAGE PROMPT RULES (IMPORTANT):**\n\n- For each scene, **identify which character(s) are present**.\n- Pull their **exact appearance details** from `character_profiles`.\n- Generate a vivid `image_prompt` that:\n  - Includes all those appearance traits explicitly (skin, eyes, hair, clothes, etc.)\n  - Describes the setting clearly.\n  - Mentions the exact style \"{{ $('On form submission').item.json['Preferred Style'] }}\".\n  - Is **NSFW safe**.\n  - is family-friendly, safe for work\n- Do NOT skip any visual traits for the character in image prompts.\n- - Do NOT translate image prompts; keep them in English regardless of story language.  \n- For each scene in the story array, the image_prompt must fully describe all relevant characters' physical appearances and outfits, even if they have already appeared in previous scenes.\n- **DO NOT assume previous knowledge of characters across scenes. Every image_prompt must repeat ALL visible characters' full appearance details as defined in character_profiles. Do NOT skip any.**\n\nFor example, if \"Al Pablo\" appears in scene 1 and again in any of the scene, his full appearance must be repeated in both image prompts.\n\n[\n  {\n    \"scene_number\": 1,\n    \"scene_text\": \"मुंबई की गलियों में अल पाब्लो का नाम डर की तरह फैला हुआ था। उसकी काले सूट और लाल टाई वाली पहचान थी।\",\n    \"image_prompt\": \"Low Poly style. Al Pablo, a muscular man with tan skin, dark brown eyes, black slicked-back hair, wearing a black suit with a red tie and a gold chain, standing in a dark Mumbai alley. The atmosphere is tense and cinematic. Is family-friendly, safe for work\"\n  },\n{\n  \"scene_number\": 4,\n  \"scene_text\": \"अल पाब्लो को पता चलता है कि कार्लोस उसके खिलाफ है। वह अपनी टीम को तैयार करता है।\",\n  \"image_prompt\": \"Al Pablo, a muscular man with tan skin, dark brown eyes, black slicked-back hair, wearing a black suit with a red tie and gold chain, stands confidently in a warehouse with his team. is family-friendly, safe for work\"\n}\n.\n.\n.\n\"scene_number\": {{ $('Edit Fields1').item.json.scenes }},\n  \"scene_text\": \"अल पाब्लो को पता चलता है कि कार्लोस उसके खिलाफ है। वह अपनी टीम को तैयार करता है।\",\n  \"image_prompt\": \"Al Pablo, a muscular man with tan skin, dark brown eyes, black slicked-back hair, wearing a black suit with a red tie and gold chain, stands confidently in a warehouse with his team. and is family-friendly, safe for work\"\n}\n]\n---\n\n**OUTPUT FORMAT:**\nYou must return valid JSON with two keys:\n\n- `\"character_profiles\"`: An array of detailed character objects (as described above).\n- `\"story\"`: An array of exactly **{{ $('Edit Fields1').item.json.scenes }} objects**, each representing one scene with:\n  - `scene_number` (1-{{ $('Edit Fields1').item.json.scenes }}),\n  - `scene_text` (1-2 lines, in \"{{ $('On form submission').item.json['Preferred Language'] }}\", pacing {{ $('Edit Fields1').item.json.Seconds }} seconds),\n  - `image_prompt` (detailed, consistent, with character appearance and style \"{{ $('On form submission').item.json['Preferred Style'] }}\")\n\nNo extra text. No markdown. No explanation.\n\n---\n\n**RULES:**\n- Mention in each image prompt that the image should not be deformed and should not contain any Text.\n- Be engaging and cinematic.\n- Theme, tone, and characters must be consistent.\n- - Do NOT translate image prompts; keep them in English regardless of story language.  \n- Numbers in `scene_text` must always be words in the selected language.\n- Each `image_prompt` must clearly include all visible characters' detailed appearance.\n- DO NOT assume previous knowledge of characters across scenes. Every image_prompt must repeat ALL visible characters' full appearance details as defined in character_profiles. Do NOT skip any.\n- Scene text must NEVER include unescaped double quotes (\").\n- If a character speaks, use escaped quotes like this: \\\"...\\\".\n- The final output must be valid JSON and must never break due to formatting.\n- Use the character details from the `\"character_profiles\"` array explicitly in every image_prompt. Do not summarize. Always include:\n name\n gender\n skin_color\n eye_color\n hair_color\n hairstyle\n body_type\n clothing\n accessories\n vibe\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        180,
+        740
+      ],
+      "name": "Story Writer",
+      "id": "de0c02b9-0f7c-479c-b5ce-18c0387af94d"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Step 1: Raw output from LLM\nconst rawString = $input.first().json.output;\n\n// Step 2: Clean unwanted formatting\nlet cleanedString = rawString.replace(/```json/g, '').replace(/```/g, '').trim();\ncleanedString = cleanedString.replace(/\\\\n/g, '').replace(/\\\\\"/g, '\"').trim();\n\n// Step 3: Parse the whole JSON object\nlet parsed;\ntry {\n  parsed = JSON.parse(cleanedString);\n} catch (error) {\n  throw new Error(\"JSON parsing failed: \" + error.message + \" | Cleaned string was: \" + cleanedString);\n}\n\n// Step 4: Check if 'story' exists and is array\nif (!Array.isArray(parsed.story)) {\n  throw new Error(\"Expected 'story' to be an array but got: \" + typeof parsed.story);\n}\n\n// Step 5: Return each scene as individual output\nreturn parsed.story.map(scene => ({ json: scene }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        560
+      ],
+      "name": "The QA",
+      "id": "ab1cd61a-36c6-448a-85ff-b9939e05dbdd",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1080,
+        420
+      ],
+      "name": "Director",
+      "id": "c3600ae2-2901-4fd3-b1d9-fd6673d1678c"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.together.xyz/v1/images/generations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"black-forest-labs/FLUX.1-schnell-Free\",\n  \"prompt\": \"{{ $('Director').item.json.image_prompt }}\",\n  \"negative_prompt\": \"blurry, low quality, extra limbs, extra legs, disfigured, poorly drawn face, missing legs, duplicate characters, fused limbs, bad hands, distorted anatomy, glitch\",\n  \"steps\": 4,\n  \"n\": 1,\n   \"width\": {{ $('Edit Fields1').item.json.width }},\n  \"height\": {{ $('Edit Fields1').item.json.height }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1580,
+        460
+      ],
+      "name": "Cameraman",
+      "id": "d3ed8ef3-0685-4dc2-8689-14f3edcae7fd",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "b1950a3e-f3ee-441e-be7c-afd070b6903c",
+          "name": "transcribe"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.shotstack.io/stage/render",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "O1Ec4KKKLvdYgZy8bQ5U2kBVpyjbQ9V0bSvmXQNw"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"output\": {\n    \"format\": \"mp4\",\n    \"resolution\": \"1080\",\n\"aspectRatio\": \"{{ $('Edit Fields1').item.json.aspectRatio }}\",\n  \"fps\": 25\n  },\n  \"timeline\": {\n    \"soundtrack\": {\n      \"src\": \"{{ $('Create Download URL').item.json.downloadableUrl }}\"\n    },\n    \"background\": \"#000000\",\n    \"tracks\": [\n      {\n        \"clips\": [\n          {\n            \"asset\": {\n              \"type\": \"image\",\n              \"src\": \"{{ $('Create Download URL1').item.json.originalUrl }}\"\n            },\n            \"start\": 0,\n            \"length\": {{ $json.durationSeconds }}, \n            \"effect\": \"zoomIn\",\n            \"fit\": \"cover\"\n          }\n        ]\n      }\n    ]\n  }\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        340,
+        1860
+      ],
+      "name": "Video Editor",
+      "id": "9571c3ac-a09d-4051-bf38-9a976b03d57e"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        600,
+        1860
+      ],
+      "name": "Assistant",
+      "id": "c8c9ce7a-2856-4aaf-93f3-2e2574b549d5",
+      "webhookId": "5ff9e544-3c05-49fc-bc0b-d79818bd9bb0"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.shotstack.io/stage/render/{{ $json.response.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "O1Ec4KKKLvdYgZy8bQ5U2kBVpyjbQ9V0bSvmXQNw"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        1860
+      ],
+      "name": "Assistant 2",
+      "id": "671810ea-afe6-48b1-8846-d44b6417fd60"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bedca9c3-ef03-4359-a43a-deae59635341",
+              "leftValue": "={{ $json.response.status }}",
+              "rightValue": "done",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        980,
+        1860
+      ],
+      "name": "Assistant 3",
+      "id": "1a3fb638-af63-480d-9480-5645cda921c0"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();  // Get all input items\n\nconst Duration = items.map(item => \n  Math.ceil(item.json.response.duration)\n);\n\nconst url = items.map(item => \n  item.json.response.url\n);\n\nreturn [\n  {\n    json: {\n      Duration: Duration,\n      url: url\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        340,
+        2180
+      ],
+      "name": "Assistant of Assistant Organizer",
+      "id": "472fcdc7-1884-48e2-a0eb-d52d15168b32"
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        900,
+        2180
+      ],
+      "name": "Assistant 4",
+      "id": "ecd9b864-3f8d-4e8c-a203-94a5aad5837c",
+      "webhookId": "11fc7f85-3e91-4f89-b8ca-0945d5352ba5"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.shotstack.io/stage/render/{{ $json.response.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "O1Ec4KKKLvdYgZy8bQ5U2kBVpyjbQ9V0bSvmXQNw"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1080,
+        2180
+      ],
+      "name": "Assistant 5",
+      "id": "b19e8d85-b4a1-4151-a09e-91cc342ab4aa"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bedca9c3-ef03-4359-a43a-deae59635341",
+              "leftValue": "={{ $json.response.status }}",
+              "rightValue": "done",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1300,
+        2180
+      ],
+      "name": "Assistant 6",
+      "id": "53998e6e-0d54-40a0-8ef8-06833525b2de"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "base64Audio",
+              "value": "={{ $json.audio_data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set Base64 List",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        1360
+      ],
+      "id": "3f8e94d6-2db5-4273-9407-f0c6fac5e83e"
+    },
+    {
+      "parameters": {
+        "functionCode": "const now = new Date();\nconst timestamp = now.toISOString().replace(/[:.]/g, '-');\nconst fileName = `speech-${timestamp}-${Math.floor(Math.random()*10000)}.mp3`;\n\nreturn [{\n  json: {\n    fileName,\n    base64Audio: $json.base64Audio,\n  }\n}];"
+      },
+      "name": "Generate Filename",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        1360
+      ],
+      "id": "bccf5658-8c13-4bc2-b9d9-5b9ae13f796c"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://ycysmemlzykcvvmlwtsu.supabase.co/storage/v1/object/audio-files/{{$json.fileName}}?upsert=true",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InljeXNtZW1senlrY3Z2bWx3dHN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3NDY1NTQsImV4cCI6MjA2NTMyMjU1NH0.WSYEmMEgB9SP60BDJhBkn5Tt7gUENYbp0ubxzKKBWVk"
+            },
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InljeXNtZW1senlrY3Z2bWx3dHN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3NDY1NTQsImV4cCI6MjA2NTMyMjU1NH0.WSYEmMEgB9SP60BDJhBkn5Tt7gUENYbp0ubxzKKBWVk"
+            },
+            {
+              "name": "Content-Type",
+              "value": "audio/mpeg"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "audioFile",
+        "options": {}
+      },
+      "name": "Upload to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        2020,
+        1360
+      ],
+      "id": "1c01d65e-4642-4bc6-8b4b-b800f2950fde"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "downloadableUrl",
+              "value": "=https://ycysmemlzykcvvmlwtsu.supabase.co/storage/v1/object/public/audio-files//{{ $('Code2').item.json.fileName }}?download=1&filename={{ $('Code2').item.json.fileName }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Create Download URL",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        1360
+      ],
+      "id": "58ae6c28-d353-4092-8920-85ec86c0a060"
+    },
+    {
+      "parameters": {
+        "jsCode": "const base64 = $json.base64Audio;\nconst cleanBase64 = base64.includes(',') ? base64.split(',')[1] : base64;\n\n// File size calculation\nconst sizeInBytes = Math.ceil((cleanBase64.length * 3) / 4) - (cleanBase64.endsWith('==') ? 2 : cleanBase64.endsWith('=') ? 1 : 0);\n\n// ⛏ Try to extract duration from speech_marks\nconst chunks = $json.speech_marks?.chunks;\n\nlet durationMs = 0;\nlet durationSeconds = 0;\nlet bitrateKbps = 0;\n\nif (Array.isArray(chunks) && chunks.length > 0) {\n  const lastChunk = chunks[chunks.length - 1];\n  durationMs = lastChunk?.end_time || 0;\n  durationSeconds = Math.ceil(durationMs / 1000);\n\n  // ⛏ Only calculate bitrate if duration > 0\n  if (durationSeconds > 0) {\n    bitrateKbps = Math.round((sizeInBytes * 8) / durationSeconds / 1000);\n  }\n}\n\n// 🧠 Output with debug values\nreturn [\n  {\n    binary: {\n      audioFile: {\n        data: cleanBase64,\n        mimeType: 'audio/mpeg',\n        fileName: $json.fileName || 'speech.mp3'\n      }\n    },\n    json: {\n      fileName: $json.fileName || 'speech.mp3',\n      estimatedDuration: durationSeconds,\n      bitrateKbps,\n      debug: {\n        chunkLength: chunks?.length || 0,\n        lastChunk: chunks?.[chunks.length - 1] || null,\n        durationMs,\n        sizeInBytes\n      }\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1620,
+        1360
+      ],
+      "name": "Code2",
+      "id": "893c26f1-35bf-427c-b8bc-962e19691c74"
+    },
+    {
+      "parameters": {
+        "content": "##                                        Generate Audio per scenes\n",
+        "height": 660,
+        "width": 3240,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        40,
+        1100
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note2",
+      "id": "338d0006-ae12-4e20-8ca6-41b3cf092e9a"
+    },
+    {
+      "parameters": {
+        "content": "## Merge Audio with Images and add Transitions for each scene",
+        "height": 280,
+        "width": 1180,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        40,
+        1780
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note3",
+      "id": "c750acb8-21c3-4489-a010-d5d8cbb22eed"
+    },
+    {
+      "parameters": {
+        "content": "## Generate Images per scene",
+        "height": 1140,
+        "width": 2280,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        860,
+        -20
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note4",
+      "id": "9cc75151-ab08-46e4-9779-62876a118a05"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('On form submission').item.json['Preferred Language'] }}",
+                    "rightValue": "English",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e84f8239-832b-4de5-bc5c-5b017ef14d08"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cf0995b6-0275-4a64-8094-e549cb295eb5",
+                    "leftValue": "={{ $('On form submission').item.json['Preferred Language'] }}",
+                    "rightValue": "Hindi",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        340,
+        1360
+      ],
+      "name": "Switch",
+      "id": "10649c80-887f-4570-8e44-b2aeec8d7d6e"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.sws.speechify.com/v1/audio/speech",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 9F2O8xWxxH6XIfkDN5BS4Qbw21kVQEzN9q87GqvCf5w="
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": \"{{ $('Director').item.json.scene_text }}\",\n  \"voice_id\": \"hemant\",\n  \"audio_format\": \"mp3\",\n  \"language\": \"hi-IN\",\n  \"model\": \"simba-multilingual\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        1420
+      ],
+      "name": "Hemant (Hindi)",
+      "id": "332bc1a4-0a11-4e7b-afa7-3d3b37b2d51b"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.sws.speechify.com/v1/audio/speech",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 9F2O8xWxxH6XIfkDN5BS4Qbw21kVQEzN9q87GqvCf5w="
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": \"{{ $('Director').item.json.scene_text }}\",\n  \"voice_id\": \"george\",\n  \"audio_format\": \"mp3\",\n  \"language\": \"en-US\",\n  \"model\": \"simba-english\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        1120
+      ],
+      "name": "george(English)",
+      "id": "cc0959a2-8a2e-4af0-81fe-6a4aca85b9a4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.sws.speechify.com/v1/audio/speech",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 9F2O8xWxxH6XIfkDN5BS4Qbw21kVQEzN9q87GqvCf5w="
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": \"{{ $('Director').item.json.scene_text }}\",\n  \"voice_id\": \"lisa\",\n  \"audio_format\": \"mp3\",\n  \"language\": \"en-US\",\n  \"model\": \"simba-english\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        1280
+      ],
+      "name": "lisa(English)",
+      "id": "66b4206b-64e8-4e22-afcd-0d766dc34d96"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('On form submission').item.json['Preferred Story Teller Voice'] }}",
+                    "rightValue": "Male",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f243a47c-7baa-44bd-b1bc-1d037b89c863"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b4d9d0eb-e117-4839-aac0-54c1608360fe",
+                    "leftValue": "={{ $('On form submission').item.json['Preferred Story Teller Voice'] }}",
+                    "rightValue": "Female",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        540,
+        1240
+      ],
+      "name": "English Voices",
+      "id": "6f09ec8a-5713-4206-bbb1-c2430fe6c567"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('On form submission').item.json['Preferred Story Teller Voice'] }}",
+                    "rightValue": "Male",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f243a47c-7baa-44bd-b1bc-1d037b89c863"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b4d9d0eb-e117-4839-aac0-54c1608360fe",
+                    "leftValue": "={{ $('On form submission').item.json['Preferred Story Teller Voice'] }}",
+                    "rightValue": "Female",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        540,
+        1460
+      ],
+      "name": "Hindi Voices",
+      "id": "94fb43f9-caae-4590-bef2-97901feb8c24"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.sws.speechify.com/v1/audio/speech",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 9F2O8xWxxH6XIfkDN5BS4Qbw21kVQEzN9q87GqvCf5w="
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": \"{{ $('Director').item.json.scene_text }}\",\n  \"voice_id\": \"priya\",\n  \"audio_format\": \"mp3\",\n  \"language\": \"hi-IN\",\n  \"model\": \"simba-multilingual\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        1560
+      ],
+      "name": "priya(Hindi)",
+      "id": "6623cf70-0402-4120-8104-ea510d3b479b"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('On form submission').item.json['Preferred Language'] }}",
+                    "rightValue": "English",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e84f8239-832b-4de5-bc5c-5b017ef14d08"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cf0995b6-0275-4a64-8094-e549cb295eb5",
+                    "leftValue": "={{ $('On form submission').item.json['Preferred Language'] }}",
+                    "rightValue": "Hindi",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2480,
+        1360
+      ],
+      "name": "Switch1",
+      "id": "082062a9-3cac-4e33-9e86-09c2eb978a70"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('On form submission').item.json['Preferred Story Teller Voice'] }}",
+                    "rightValue": "Male",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f243a47c-7baa-44bd-b1bc-1d037b89c863"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b4d9d0eb-e117-4839-aac0-54c1608360fe",
+                    "leftValue": "={{ $('On form submission').item.json['Preferred Story Teller Voice'] }}",
+                    "rightValue": "Female",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2780,
+        1260
+      ],
+      "name": "English Voices1",
+      "id": "d02702cc-aa75-42f8-822b-01093e001570"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('On form submission').item.json['Preferred Story Teller Voice'] }}",
+                    "rightValue": "Male",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f243a47c-7baa-44bd-b1bc-1d037b89c863"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b4d9d0eb-e117-4839-aac0-54c1608360fe",
+                    "leftValue": "={{ $('On form submission').item.json['Preferred Story Teller Voice'] }}",
+                    "rightValue": "Female",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2780,
+        1480
+      ],
+      "name": "Hindi Voices1",
+      "id": "241c431c-c73b-4d92-95d8-6f79b0d9a9b9"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get audio Base64 string\nconst audioBase64 = $node[\"george(English)\"].json[\"audio_data\"];\n\n// Calculate file size from Base64 string\nconst sizeInBytes = Math.ceil((audioBase64.length * 3) / 4) -\n  (audioBase64.endsWith('==') ? 2 : audioBase64.endsWith('=') ? 1 : 0);\n\n// ❗️THIS is the correct way to extract speech_marks\nconst speechMarksObj = $node[\"george(English)\"].json[\"speech_marks\"];\nconst speechMarks = speechMarksObj && speechMarksObj.chunks;\n\n// Validate\nif (!speechMarks || !Array.isArray(speechMarks)) {\n  throw new Error(\"speech_marks.chunks is missing or not an array\");\n}\n\n// Duration from last chunk\nconst lastChunk = speechMarks[speechMarks.length - 1];\nconst durationMs = lastChunk.end_time;\n\n// Duration in seconds\nconst durationSeconds = Math.ceil(durationMs / 1000);\n\n// Bitrate calculation\nconst bitrateKbps = Math.round((sizeInBytes * 8) / durationSeconds / 1000);\n\n// Return the processed audio\nreturn [\n  {\n    binary: {\n      data: {\n        data: audioBase64,\n        mimeType: \"audio/mp3\",\n        fileName: \"output.mp3\",\n        fileSize: sizeInBytes\n      }\n    },\n    json: {\n      durationSeconds,\n      bitrateKbps\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3060,
+        1160
+      ],
+      "name": "George voice download",
+      "id": "b4333cf8-71a3-4929-aa15-72d94f092318"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get audio Base64 string from HTTP Request node\nconst audioBase64 = $node[\"lisa(English)\"].json[\"audio_data\"];\n\n// Calculate file size from Base64 string\nconst sizeInBytes = Math.ceil((audioBase64.length * 3) / 4) -\n  (audioBase64.endsWith('==') ? 2 : audioBase64.endsWith('=') ? 1 : 0);\n\n// Get speech_marks.chunks array from HTTP Request node\nconst speechMarksObj = $node[\"lisa(English)\"].json[\"speech_marks\"];\nconst speechMarks = speechMarksObj && speechMarksObj.chunks;\n\n// Validate that speechMarks is an array\nif (!speechMarks || !Array.isArray(speechMarks)) {\n  throw new Error(\"speech_marks.chunks is missing or not an array\");\n}\n\n// Get last chunk to determine audio duration\nconst lastChunk = speechMarks[speechMarks.length - 1];\nconst durationMs = lastChunk.end_time;\n\n// Convert duration to seconds (rounded up)\nconst durationSeconds = Math.ceil(durationMs / 1000);\n\n// Calculate audio bitrate in kbps\nconst bitrateKbps = Math.round((sizeInBytes * 8) / durationSeconds / 1000);\n\n// Return the processed audio as binary + duration + bitrate info\nreturn [\n  {\n    binary: {\n      data: {\n        data: audioBase64,\n        mimeType: \"audio/mp3\",\n        fileName: \"output.mp3\",\n        fileSize: sizeInBytes\n      }\n    },\n    json: {\n      durationSeconds,\n      bitrateKbps\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3060,
+        1300
+      ],
+      "name": "Lisa voice download",
+      "id": "142e8bb6-acb4-4a92-9c3c-e7af158c47fa"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get audio Base64 string from HTTP Request node\nconst audioBase64 = $node[\"Hemant (Hindi)\"].json[\"audio_data\"];\n\n// Calculate file size from Base64 string\nconst sizeInBytes = Math.ceil((audioBase64.length * 3) / 4) -\n  (audioBase64.endsWith('==') ? 2 : audioBase64.endsWith('=') ? 1 : 0);\n\n// Get speech_marks.chunks array from HTTP Request node\nconst speechMarksObj = $node[\"Hemant (Hindi)\"].json[\"speech_marks\"];\nconst speechMarks = speechMarksObj && speechMarksObj.chunks;\n\n// Validate that speechMarks is an array\nif (!speechMarks || !Array.isArray(speechMarks)) {\n  throw new Error(\"speech_marks.chunks is missing or not an array\");\n}\n\n// Get last chunk to determine audio duration\nconst lastChunk = speechMarks[speechMarks.length - 1];\nconst durationMs = lastChunk.end_time;\n\n// Convert duration to seconds (rounded up)\nconst durationSeconds = Math.ceil(durationMs / 1000);\n\n// Calculate audio bitrate in kbps\nconst bitrateKbps = Math.round((sizeInBytes * 8) / durationSeconds / 1000);\n\n// Return the processed audio as binary + duration + bitrate info\nreturn [\n  {\n    binary: {\n      data: {\n        data: audioBase64,\n        mimeType: \"audio/mp3\",\n        fileName: \"output.mp3\",\n        fileSize: sizeInBytes\n      }\n    },\n    json: {\n      durationSeconds,\n      bitrateKbps\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3060,
+        1420
+      ],
+      "name": "Hemant Voice Download",
+      "id": "d7904b99-7467-44f9-96eb-ca320cc2bbe3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get audio Base64 string from HTTP Request node\nconst audioBase64 = $node[\"priya(Hindi)\"].json[\"audio_data\"];\n\n// Calculate file size from Base64 string\nconst sizeInBytes = Math.ceil((audioBase64.length * 3) / 4) -\n  (audioBase64.endsWith('==') ? 2 : audioBase64.endsWith('=') ? 1 : 0);\n\n// Get speech_marks.chunks array from HTTP Request node\nconst speechMarksObj = $node[\"priya(Hindi)\"].json[\"speech_marks\"];\nconst speechMarks = speechMarksObj && speechMarksObj.chunks;\n\n// Validate that speechMarks is an array\nif (!speechMarks || !Array.isArray(speechMarks)) {\n  throw new Error(\"speech_marks.chunks is missing or not an array\");\n}\n\n// Get last chunk to determine audio duration\nconst lastChunk = speechMarks[speechMarks.length - 1];\nconst durationMs = lastChunk.end_time;\n\n// Convert duration to seconds (rounded up)\nconst durationSeconds = Math.ceil(durationMs / 1000);\n\n// Calculate audio bitrate in kbps\nconst bitrateKbps = Math.round((sizeInBytes * 8) / durationSeconds / 1000);\n\n// Return the processed audio as binary + duration + bitrate info\nreturn [\n  {\n    binary: {\n      data: {\n        data: audioBase64,\n        mimeType: \"audio/mp3\",\n        fileName: \"output.mp3\",\n        fileSize: sizeInBytes\n      }\n    },\n    json: {\n      durationSeconds,\n      bitrateKbps\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3060,
+        1560
+      ],
+      "name": "Priya Voice Download",
+      "id": "e0786043-05dc-4b68-9932-a25acac4749c"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('On form submission').item.json['Theme/Title'] }}",
+        "options": {
+          "systemMessage": "=You are an expert **TikTok Short Video Director** and a talented **Story Writer**.  \nYou specialize in creating **short, engaging stories** broken into **{{ $('Edit Fields1').item.json.scenes }} scenes**, perfect for visual storytelling.\n\nYou have deep knowledge of pacing, visuals, and maintaining theme and character consistency.\n\n**TASK:**  \nGenerate a story based on the following user-provided theme/idea: {{ $('On form submission').item.json['Theme/Title'] }}. Every Story must have an interesting hook and an ending.\n\n**LANGUAGE:**  \nGenerate the story script strictly in the user-selected language \"{{ $('On form submission').item.json['Preferred Language'] }}\".\n\n**VISUAL STYLE:**  \nApply this consistent visual style to all image prompts: \"{{ $('On form submission').item.json['Preferred Style'] }}\".  \nEnsure all image prompts explicitly include and match this style and are family-friendly, NSFW safe.\n\nDIALOGUE RULE (IMPORTANT):  \n- Do NOT include any kind of quotes (single or double) around character dialogues in `scene_text`.\n- If a character is speaking, just write the sentence naturally without surrounding it with quotation marks.\n- Avoid unescaped quotes completely to ensure valid JSON.\n\n**NUMBER HANDLING:**  \nWhen writing scene_text, if any number appears, write it in **words** in the selected language (e.g. \"three\" or its translated equivalent), not as numerals (e.g. \"3\").  \nThis is critical to ensure smooth TTS performance.\n\n**SCENE TIMING:**  \nEach scene must represent **{{ $('Edit Fields1').item.json.Seconds }} seconds** of screen time.  \nScene_text should be **short and concise**, aligned to this pacing.\n\n**FORMAT:**  \nYou must return the result as a valid JSON array of exactly **{{ $('Edit Fields1').item.json.scenes }} objects**, each representing one scene.\n\nEach scene object must have the following fields:\n\n- **scene_number**: (integer 1 to {{ $('Edit Fields1').item.json.scenes }})  \n- **scene_text**: (1-2 short sentences summarizing what happens in this scene, aligned with the overall story and theme, suitable for {{ $('Edit Fields1').item.json.Seconds }} seconds of screen time)  \n- **image_prompt**: (A vivid, clear, detailed visual description prompt in English, following and mentioning the selected Style \"{{ $('On form submission').item.json['Preferred Style'] }}\", and are NSFW safe, and maintaining consistent characters and setting throughout all scenes)\n\n**CHARACTER HANDLING:**\n- Introduce and define key characters early.\n- Maintain **consistent names, species, traits, and appearances** across all image prompts.\n- For animal characters like \"Raju the monkey\", always write **\"Raju the monkey\"** or **\"Raju, a clever cartoon monkey wearing a red cap\"** in every image_prompt. \n- **DO NOT switch to a human character at any point.**\n- **Explicitly restate the animal type in every image_prompt to avoid visual inconsistency.**\n\n**VISUAL STYLE:**\nApply this consistent visual style to all image prompts: \"{{ $('On form submission').item.json['Preferred Style'] }}\".  \nEnsure all image prompts **explicitly mention** this style and are **family-friendly and NSFW safe**.\n\n**RULES:**  \n- The story should be **engaging and creative**.  \n- Maintain **consistent names, species, traits, and appearances** across all image prompts.  \n- Animal characters must remain animals in **every image prompt**. Never convert to humans.  \n- The theme and tone should stay **consistent** from start to end.  \n- Characters must remain **consistent** throughout the scenes (names, appearances, personality).  \n- The story should be suitable for a **TikTok short video** format.  \n- All scene_text must have numbers written in words, in the selected language.  \n- Each scene_text should fit into a **{{ $('Edit Fields1').item.json.Seconds }} second** visual moment.  \n- Do not include any extra text outside the JSON array.  \n- Do not include markdown formatting or explanations. \n- Scene text must NEVER include unescaped double quotes (\").\n- If a character speaks, use escaped quotes like this: \\\"...\\\".\n- The final output must be valid JSON and must never break due to formatting.\n- Do NOT translate image prompts; keep them in English regardless of story language.  \n- The Style \"{{ $('On form submission').item.json['Preferred Style'] }}\" must be clearly stated inside each image_prompt and the image_prompt must be NSFW safe.  \n\n**IMPORTANT ENFORCEMENT:**  \nIf a story features animals like lions, cats, dogs, elephants, monkeys, etc., then the `image_prompt` MUST mention their full species identity **in every prompt** in the format like:  \n**“Rani, a brave cartoon lioness wearing golden armor”**  \nor  \n**“Chintu the squirrel, a playful cartoon squirrel with glasses and a tiny backpack”**  \nThis avoids accidental generation of humans.\n\n**OUTPUT JSON EXAMPLE:**  \n```json\n[\n  {\n    \"scene_number\": 1,\n    \"scene_text\": \"Example scene text here.\",\n    \"image_prompt\": \"Example image prompt here. The image must follow the {{ $('On form submission').item.json['Preferred Style'] }} style and are family-friendly, safe for work\"\n  },\n  ...\n  {\n    \"scene_number\": {{ $('Edit Fields1').item.json.scenes }},\n    \"scene_text\": \"Example final scene text here.\",\n    \"image_prompt\": \"Example image prompt here. The image must follow the {{ $('On form submission').item.json['Preferred Style'] }} style and are family-friendly, safe for work.\"\n  }\n]"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        180,
+        540
+      ],
+      "name": "Story Writer1",
+      "id": "bb49cca3-5b6d-42b0-97db-2c58dab1a2c9"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('On form submission').item.json['Choose what you want?'] }}",
+                    "rightValue": "Elemental videos ( For Stories with no humans, Best for animal stories and motivational stories )",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4fed5de5-78e1-4f92-a63d-02fc0ebb0491"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6a549ee6-b865-4062-aadf-a0447249143b",
+                    "leftValue": "={{ $('On form submission').item.json['Choose what you want?'] }}",
+                    "rightValue": "Character consistency ( For Stories with human characters )",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -100,
+        640
+      ],
+      "name": "Switch2",
+      "id": "24282f2b-3054-4e31-a8bd-0d8e32b27f98"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawString = $input.first().json.output;\n\n// Step 1: Remove ```json and ``` if present\nlet cleanedString = rawString.replace(/```json/g, '').replace(/```/g, '').trim();\n\n// Step 2: Remove unwanted newlines\ncleanedString = cleanedString\n    .replace(/\\\\n/g, '')\n    .trim();\n\n// ❗ DO NOT unescape quotes (\\\"), keep them as-is\n\n// Optional: Validate balanced brackets\nif (!cleanedString.startsWith('[') && !cleanedString.endsWith(']')) {\n    throw new Error(\"Invalid JSON array format in output\");\n}\n\n// Step 3: Try parsing JSON\nlet parsedArray;\n\ntry {\n    parsedArray = JSON.parse(cleanedString);\n} catch (error) {\n    throw new Error(\"JSON parsing failed: \" + error.message + \" | cleaned string was: \" + cleanedString);\n}\n\n// Step 4: Return parsed scenes\nreturn parsedArray.map(scene => ({ json: scene }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        280
+      ],
+      "name": "The Other QA",
+      "id": "af740ea3-3d9e-4d80-b92b-939bd29ce116",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "5777389136",
+        "text": "=Congratulations !!\nYour AI Generated Short Video is successfully created !\nYou can stream or download your video from the link below:\n{{ $json.response.url }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1600,
+        2100
+      ],
+      "name": "One Above All",
+      "id": "ba23c222-e2b3-47cd-9376-06b24b5de4d7",
+      "webhookId": "03b9b370-be68-40e5-a107-6d3fbebfe6f2",
+      "credentials": {
+        "telegramApi": {
+          "id": "80f966b4-139d-4f13-ae72-1e828df32592",
+          "name": "Telegram_My Wife"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "7977359346",
+        "text": "=Congratulations !!\nYour AI Generated Short Video is successfully created !\nYou can stream or download your video from the link below:\n{{ $json.response.url }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1600,
+        2260
+      ],
+      "name": "One Above All1",
+      "id": "1d5f643d-b83e-4cda-ab66-e552355db89f",
+      "webhookId": "85c639dd-cfe3-4f6b-9f82-84d0c15b8cb4",
+      "credentials": {
+        "telegramApi": {
+          "id": "80f966b4-139d-4f13-ae72-1e828df32592",
+          "name": "Telegram_My Wife"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "30635eaf-2d09-456a-8fc5-75cb75381261",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1780,
+        460
+      ],
+      "name": "If",
+      "id": "adffc663-eeb0-4a71-8d29-5005ce9379fd"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.together.xyz/v1/images/generations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"black-forest-labs/FLUX.1-schnell-Free\",\n  \"prompt\": \"{{ $('Director').item.json.image_prompt }}\",\n  \"negative_prompt\": \"blurry, low quality, extra limbs, extra legs, disfigured, poorly drawn face, missing legs, duplicate characters, fused limbs, bad hands, distorted anatomy, glitch\",\n  \"steps\": 4,\n  \"n\": 1,\n   \"width\": {{ $('Edit Fields1').item.json.width }},\n  \"height\": {{ $('Edit Fields1').item.json.height }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1580,
+        260
+      ],
+      "name": "Cameraman1",
+      "id": "4c64c764-3128-4d24-bf67-60abd82cd507",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "b1950a3e-f3ee-441e-be7c-afd070b6903c",
+          "name": "transcribe"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "30635eaf-2d09-456a-8fc5-75cb75381261",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1780,
+        260
+      ],
+      "name": "If1",
+      "id": "02267ef2-113d-4ad4-a1f1-a69055875769"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.together.xyz/v1/images/generations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"black-forest-labs/FLUX.1-schnell-Free\",\n  \"prompt\": \"{{ $('Director').item.json.image_prompt }}\",\n  \"negative_prompt\": \"blurry, low quality, extra limbs, extra legs, disfigured, poorly drawn face, missing legs, duplicate characters, fused limbs, bad hands, distorted anatomy, glitch\",\n  \"steps\": 4,\n  \"n\": 1,\n    \"width\": {{ $('Edit Fields1').item.json.width }},\n  \"height\": {{ $('Edit Fields1').item.json.height }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1580,
+        40
+      ],
+      "name": "Cameraman2",
+      "id": "5fd8490d-cfe2-4358-aa5f-e49dc853ddd3",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "b1950a3e-f3ee-441e-be7c-afd070b6903c",
+          "name": "transcribe"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data[0].url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2040,
+        500
+      ],
+      "name": "Cameraman3",
+      "id": "2abe4663-18bc-4f4e-a736-025ebbe64757",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "b1950a3e-f3ee-441e-be7c-afd070b6903c",
+          "name": "transcribe"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data[0].url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2040,
+        280
+      ],
+      "name": "Cameraman4",
+      "id": "6a829395-d314-4299-abe4-c05e7ba83b04",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "b1950a3e-f3ee-441e-be7c-afd070b6903c",
+          "name": "transcribe"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data[0].url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"black-forest-labs/FLUX.1-schnell-Free\",\n  \"prompt\": \"{{ $('Director').item.json.image_prompt }}\",\n  \"negative_prompt\": \"blurry, low quality, extra limbs, extra legs, disfigured, poorly drawn face, missing legs, duplicate characters, fused limbs, bad hands, distorted anatomy, glitch\",\n  \"steps\": 4,\n  \"n\": 1,\n  \"width\": 720,\n  \"height\": 1280\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2040,
+        40
+      ],
+      "name": "Cameraman5",
+      "id": "3fd012f4-d677-4723-9bc8-059b931d181e",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "b1950a3e-f3ee-441e-be7c-afd070b6903c",
+          "name": "transcribe"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://ycysmemlzykcvvmlwtsu.supabase.co/storage/v1/object/images/{{$json.fileName}}?upsert=true",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InljeXNtZW1senlrY3Z2bWx3dHN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3NDY1NTQsImV4cCI6MjA2NTMyMjU1NH0.WSYEmMEgB9SP60BDJhBkn5Tt7gUENYbp0ubxzKKBWVk"
+            },
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InljeXNtZW1senlrY3Z2bWx3dHN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3NDY1NTQsImV4cCI6MjA2NTMyMjU1NH0.WSYEmMEgB9SP60BDJhBkn5Tt7gUENYbp0ubxzKKBWVk"
+            },
+            {
+              "name": "Content-Type",
+              "value": "image/jpeg"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "name": "Upload to Supabase1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        2540,
+        660
+      ],
+      "id": "9ea7ea08-1b56-45cc-aa9e-eb37ff6490d5"
+    },
+    {
+      "parameters": {
+        "functionCode": "const now = new Date();\nconst timestamp = now.toISOString().replace(/[:.]/g, '-');\nconst fileName = `image-${timestamp}-${Math.floor(Math.random()*10000)}.jpg`;\n\nreturn [{\n  json: { fileName },\n  binary: items[0].binary // pass the image binary along\n}];\n"
+      },
+      "name": "Generate Filename1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2340,
+        660
+      ],
+      "id": "42776947-f3e1-4663-9423-d64561c892f7"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "originalUrl",
+              "value": "=https://ycysmemlzykcvvmlwtsu.supabase.co/storage/v1/object/public/images//{{ $('Generate Filename1').item.json.fileName }}?download=1&filename={{ $('Generate Filename1').item.json.fileName }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Create Download URL1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2780,
+        660
+      ],
+      "id": "b0c5c81b-4c7b-4ff9-a50c-287e7768263f"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "15ed4593-e4f8-4989-ab6f-fa2672a7c2ad",
+              "name": "height",
+              "value": "={{$json[\"Format\"] === \"Shorts/Reels\" ? 1280 : 720}}",
+              "type": "string"
+            },
+            {
+              "id": "e835e3c2-cb89-4915-87bc-f1191d17d3b4",
+              "name": "width",
+              "value": "={{$json[\"Format\"] === \"Shorts/Reels\" ? 720 : 1280}}",
+              "type": "string"
+            },
+            {
+              "id": "ed1d6135-1ee9-4feb-832d-0849de9cc567",
+              "name": "aspectRatio",
+              "value": "={{$json[\"Format\"] === \"Shorts/Reels\" ? \"9:16\" : \"16:9\"}}",
+              "type": "string"
+            },
+            {
+              "id": "477e4ca1-271e-4f6c-b2de-56fb74b3ee8e",
+              "name": "=scenes",
+              "value": "={{$json[\"Image Generator\"] === \"Gemini\" ? \"7\" : \"10\"}}",
+              "type": "number"
+            },
+            {
+              "id": "7850c4c7-0add-4095-a498-844baaf21f1e",
+              "name": "Seconds",
+              "value": "={{$json[\"Image Generator\"] === \"Gemini\" ? \"8\" : \"5\"}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -600,
+        460
+      ],
+      "name": "Edit Fields1",
+      "id": "98eba2d3-e2bd-45be-8094-d167cb3032c4"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('On form submission').item.json['Choose what you want?'] }}",
+                    "rightValue": "Elemental videos ( For Stories with no humans, Best for animal stories and motivational stories )",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4fed5de5-78e1-4f92-a63d-02fc0ebb0491"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6a549ee6-b865-4062-aadf-a0447249143b",
+                    "leftValue": "={{ $('On form submission').item.json['Choose what you want?'] }}",
+                    "rightValue": "Character consistency ( For Stories with human characters )",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -120,
+        240
+      ],
+      "name": "Switch4",
+      "id": "fbee9bdd-05f4-4fbd-bea5-d76fd008453b"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('On form submission').item.json.Format }}",
+                    "rightValue": "Long Videos",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "458733d5-6c4d-45de-8041-df143c043ae8"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a3b4339f-495b-4c72-b277-05d9f8175f27",
+                    "leftValue": "={{ $('On form submission').item.json.Format }}",
+                    "rightValue": "Shorts/Reels",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -380,
+        460
+      ],
+      "name": "Switch3",
+      "id": "7130ecde-8eec-44a5-aa22-b57158c72543"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('On form submission').item.json['Theme/Title'] }}",
+        "options": {
+          "systemMessage": "=You are an expert **TikTok Short Video Director** and a talented **Story Writer**.  \nYou specialize in creating **short, engaging stories** broken into **13 scenes**, perfect for visual storytelling.\n\nYou have deep knowledge of pacing, visuals, and maintaining theme and character consistency.\n\n---\n\n**TASK:**  \nGenerate a story based on the following user-provided theme/idea: \"{{ $('On form submission').item.json['Theme/Title'] }}\".\nEvery story must have an interesting hook and a powerful ending.\n\n---\n\n**LANGUAGE:**  \nGenerate the story script strictly in the user-selected language \"{{ $('On form submission').item.json['Preferred Language'] }}\".\n\n---\nDIALOGUE RULE (IMPORTANT):  \n- Do NOT include any kind of quotes (single or double) around character dialogues in `scene_text`.\n- If a character is speaking, just write the sentence naturally without surrounding it with quotation marks.\n- Avoid unescaped quotes completely to ensure valid JSON.\n---\n**VISUAL STYLE:**  \nApply this consistent visual style to all image prompts: \"{{ $('On form submission').item.json['Preferred Style'] }}\".  \nEnsure all image prompts explicitly include and match this style and are family-friendly, safe for work.\n\n---\n\n**NUMBER HANDLING:**  \nIn all scene_text, if any number appears, write it in **words** (translated in the selected language), never as digits.\n\n---\n\n**SCENE TIMING:**  \nEach scene must represent **9 to 10 seconds** of screen time. Scene_text should be **short and concise**, aligned with this pacing.\n\n---\n\n**CHARACTER PROFILE HANDLING:**  \nBefore generating the scenes, define a `\"character_profiles\"` array. Each character must have:\n\n- `name`,  \n- `gender`,  \n- `age`,  \n- `skin_color`,  \n- `eye_color`,  \n- `hair_color`,  \n- `hairstyle`,  \n- `body_type`,  \n- `clothing`,  \n- `accessories`,  \n- `vibe`.\n\nYou MUST reuse these character profiles in the story consistently.\n\n---\n**IMAGE PROMPT RULES (IMPORTANT):**\n\n- For each scene, **identify which character(s) are present**.\n- Pull their **exact appearance details** from `character_profiles`.\n- Generate a vivid `image_prompt` that:\n  - Includes all those appearance traits explicitly (skin, eyes, hair, clothes, etc.)\n  - Describes the setting clearly.\n  - Mentions the exact style \"{{ $('On form submission').item.json['Preferred Style'] }}\".\n  - Is **NSFW safe**.\n  - is family-friendly, safe for work\n- Do NOT skip any visual traits for the character in image prompts.\n- - Do NOT translate image prompts; keep them in English regardless of story language.  \n- For each scene in the story array, the image_prompt must fully describe all relevant characters' physical appearances and outfits, even if they have already appeared in previous scenes.\n- **DO NOT assume previous knowledge of characters across scenes. Every image_prompt must repeat ALL visible characters' full appearance details as defined in character_profiles. Do NOT skip any.**\n\nFor example, if \"Al Pablo\" appears in scene 1 and again in any of the scene, his full appearance must be repeated in both image prompts.\n\n[\n  {\n    \"scene_number\": 1,\n    \"scene_text\": \"मुंबई की गलियों में अल पाब्लो का नाम डर की तरह फैला हुआ था। उसकी काले सूट और लाल टाई वाली पहचान थी।\",\n    \"image_prompt\": \"Low Poly style. Al Pablo, a muscular man with tan skin, dark brown eyes, black slicked-back hair, wearing a black suit with a red tie and a gold chain, standing in a dark Mumbai alley. The atmosphere is tense and cinematic. Is family-friendly, safe for work\"\n  },\n{\n  \"scene_number\": 4,\n  \"scene_text\": \"अल पाब्लो को पता चलता है कि कार्लोस उसके खिलाफ है। वह अपनी टीम को तैयार करता है।\",\n  \"image_prompt\": \"Al Pablo, a muscular man with tan skin, dark brown eyes, black slicked-back hair, wearing a black suit with a red tie and gold chain, stands confidently in a warehouse with his team. is family-friendly, safe for work\"\n}\n.\n.\n.\n\"scene_number\": 13,\n  \"scene_text\": \"अल पाब्लो को पता चलता है कि कार्लोस उसके खिलाफ है। वह अपनी टीम को तैयार करता है।\",\n  \"image_prompt\": \"Al Pablo, a muscular man with tan skin, dark brown eyes, black slicked-back hair, wearing a black suit with a red tie and gold chain, stands confidently in a warehouse with his team. and is family-friendly, safe for work\"\n}\n]\n---\n\n**OUTPUT FORMAT:**\nYou must return valid JSON with two keys:\n\n- `\"character_profiles\"`: An array of detailed character objects (as described above).\n- `\"story\"`: An array of exactly **13 objects**, each representing one scene with:\n  - `scene_number` (1-13),\n  - `scene_text` (3-4 lines, in \"{{ $('On form submission').item.json['Preferred Language'] }}\", pacing 9-10 seconds),\n  - `image_prompt` (detailed, consistent, with character appearance and style \"{{ $('On form submission').item.json['Preferred Style'] }}\")\n\nNo extra text. No markdown. No explanation.\n\n---\n\n**RULES:**\n- Mention in each image prompt that the image should not be deformed and should not contain any Text.\n- Be engaging and cinematic.\n- Theme, tone, and characters must be consistent.\n- - Do NOT translate image prompts; keep them in English regardless of story language.  \n- Numbers in `scene_text` must always be words in the selected language.\n- Each `image_prompt` must clearly include all visible characters' detailed appearance.\n- DO NOT assume previous knowledge of characters across scenes. Every image_prompt must repeat ALL visible characters' full appearance details as defined in character_profiles. Do NOT skip any.\n- Scene text must NEVER include unescaped double quotes (\").\n- If a character speaks, use escaped quotes like this: \\\"...\\\".\n- The final output must be valid JSON and must never break due to formatting.\n- Use the character details from the `\"character_profiles\"` array explicitly in every image_prompt. Do not summarize. Always include:\n name\n gender\n skin_color\n eye_color\n hair_color\n hairstyle\n body_type\n clothing\n accessories\n vibe\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        180,
+        340
+      ],
+      "name": "Story Writer4",
+      "id": "e4c7b41a-25f7-4d94-b7af-7d8a21723b8f"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('On form submission').item.json['Theme/Title'] }}",
+        "options": {
+          "systemMessage": "=You are an expert **TikTok Short Video Director** and a talented **Story Writer**.  \nYou specialize in creating **short, engaging stories** broken into **13 scenes**, perfect for visual storytelling.\n\nYou have deep knowledge of pacing, visuals, and maintaining theme and character consistency.\n\n**TASK:**  \nGenerate a story based on the following user-provided theme/idea: {{ $('On form submission').item.json['Theme/Title'] }}. Every Story must have an interesting hook and an ending.\n\n**LANGUAGE:**  \nGenerate the story script strictly in the user-selected language \"{{ $('On form submission').item.json['Preferred Language'] }}\".\n\n**VISUAL STYLE:**  \nApply this consistent visual style to all image prompts: \"{{ $('On form submission').item.json['Preferred Style'] }}\".  \nEnsure all image prompts explicitly include and match this style and are family-friendly, NSFW safe.\n\nDIALOGUE RULE (IMPORTANT):  \n- Do NOT include any kind of quotes (single or double) around character dialogues in `scene_text`.\n- If a character is speaking, just write the sentence naturally without surrounding it with quotation marks.\n- Avoid unescaped quotes completely to ensure valid JSON.\n\n**NUMBER HANDLING:**  \nWhen writing scene_text, if any number appears, write it in **words** in the selected language (e.g. \"three\" or its translated equivalent), not as numerals (e.g. \"3\").  \nThis is critical to ensure smooth TTS performance.\n\n**SCENE TIMING:**  \nEach scene must represent **9 to 10 seconds** of screen time.  \nScene_text should be **short and concise**, aligned to this pacing.\n\n**FORMAT:**  \nYou must return the result as a valid JSON array of exactly **13 objects**, each representing one scene.\n\nEach scene object must have the following fields:\n\n- **scene_number**: (integer 1 to 13)  \n- **scene_text**: (3-4 short sentences summarizing what happens in this scene, aligned with the overall story and theme, suitable for 9-10 seconds of screen time)  \n- **image_prompt**: (A vivid, clear, detailed visual description prompt in English, following and mentioning the selected Style \"{{ $('On form submission').item.json['Preferred Style'] }}\", and are NSFW safe, and maintaining consistent characters and setting throughout all scenes)\n\n**CHARACTER HANDLING:**\n- Introduce and define key characters early.\n- Maintain **consistent names, species, traits, and appearances** across all image prompts.\n- For animal characters like \"Raju the monkey\", always write **\"Raju the monkey\"** or **\"Raju, a clever cartoon monkey wearing a red cap\"** in every image_prompt. \n- **DO NOT switch to a human character at any point.**\n- **Explicitly restate the animal type in every image_prompt to avoid visual inconsistency.**\n\n**VISUAL STYLE:**\nApply this consistent visual style to all image prompts: \"{{ $('On form submission').item.json['Preferred Style'] }}\".  \nEnsure all image prompts **explicitly mention** this style and are **family-friendly and NSFW safe**.\n\n**RULES:**  \n- The story should be **engaging and creative**.  \n- Maintain **consistent names, species, traits, and appearances** across all image prompts.  \n- Animal characters must remain animals in **every image prompt**. Never convert to humans.  \n- The theme and tone should stay **consistent** from start to end.  \n- Characters must remain **consistent** throughout the scenes (names, appearances, personality).  \n- The story should be suitable for a **TikTok short video** format.  \n- All scene_text must have numbers written in words, in the selected language.  \n- Each scene_text should fit into a **9-10 second** visual moment.  \n- Do not include any extra text outside the JSON array.  \n- Do not include markdown formatting or explanations. \n- Scene text must NEVER include unescaped double quotes (\").\n- If a character speaks, use escaped quotes like this: \\\"...\\\".\n- The final output must be valid JSON and must never break due to formatting.\n- Do NOT translate image prompts; keep them in English regardless of story language.  \n- The Style \"{{ $('On form submission').item.json['Preferred Style'] }}\" must be clearly stated inside each image_prompt and the image_prompt must be NSFW safe.  \n\n**IMPORTANT ENFORCEMENT:**  \nIf a story features animals like lions, cats, dogs, elephants, monkeys, etc., then the `image_prompt` MUST mention their full species identity **in every prompt** in the format like:  \n**“Rani, a brave cartoon lioness wearing golden armor”**  \nor  \n**“Chintu the squirrel, a playful cartoon squirrel with glasses and a tiny backpack”**  \nThis avoids accidental generation of humans.\n\n**OUTPUT JSON EXAMPLE:**  \n```json\n[\n  {\n    \"scene_number\": 1,\n    \"scene_text\": \"Example scene text here.\",\n    \"image_prompt\": \"Example image prompt here. The image must follow the {{ $('On form submission').item.json['Preferred Style'] }} style and are family-friendly, safe for work\"\n  },\n  ...\n  {\n    \"scene_number\": 13,\n    \"scene_text\": \"Example final scene text here.\",\n    \"image_prompt\": \"Example image prompt here. The image must follow the {{ $('On form submission').item.json['Preferred Style'] }} style and are family-friendly, safe for work.\"\n  }\n]"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        180,
+        100
+      ],
+      "name": "Story Writer5",
+      "id": "4bac53c3-cae8-4aa9-bfe8-b1514a3657f2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const urls = $json.url;\nconst durations = $json.Duration;\n\nlet clips = [];\nlet start = 0;\n\nfor (let i = 0; i < urls.length; i++) {\n  const transition = {};\n  if (i === 0) {\n    transition.out = \"fade\";\n  } else if (i === urls.length - 1) {\n    transition.in = \"fade\";\n  } else {\n    transition.in = \"fade\";\n    transition.out = \"fade\";\n  }\n\n  clips.push({\n    asset: {\n      type: \"video\",\n      src: urls[i]\n    },\n    start: start,\n    length: Number(durations[i]),\n    transition\n  });\n\n  start += Number(durations[i]);\n}\n\nreturn [\n  {\n    json: {\n      output: {\n        format: \"mp4\",\n        resolution: \"1080\",\n        aspectRatio: $('Edit Fields1').first().json.aspectRatio,\n        fps: 25\n      },\n      timeline: {\n        tracks: [\n          {\n            clips\n          }\n        ]\n      }\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        2180
+      ],
+      "name": "Code",
+      "id": "d47d11f9-1305-4d25-80e3-4ebf1171c832"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.shotstack.io/stage/render",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "O1Ec4KKKLvdYgZy8bQ5U2kBVpyjbQ9V0bSvmXQNw"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        2180
+      ],
+      "name": "Video Maker1",
+      "id": "5db93d4b-fd96-46c2-9ea5-e221a6c31c2b"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-goog-api-key",
+              "value": "AIzaSyCIQoxVii0G0hoa2bS223P1u71AQ_d-iIU"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"{{ $('Director').item.json.image_prompt }}. The image oreientation should be {{ $('Edit Fields1').item.json.aspectRatio }}. and the file size should be less than 200KB.\"\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"responseModalities\": [\"TEXT\", \"IMAGE\"]\n  }\n} ",
+        "options": {
+          "response": {
+            "response": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1580,
+        700
+      ],
+      "name": "Gemini TTI",
+      "id": "8bee8961-5595-43a9-97fb-b7175f36d633",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "candidates[0].content.parts[1].inlineData.data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2060,
+        860
+      ],
+      "name": "base64 to img",
+      "id": "7911f6e7-b639-4ec2-bfe3-4e36d4b4e6b1"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "candidates[0].content.parts[0].inlineData.data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2040,
+        680
+      ],
+      "name": "base64 to img1",
+      "id": "1faf875f-fecf-49c9-b4ce-e56ea45cfc67"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        2200
+      ],
+      "name": "No Operation, do nothing",
+      "id": "1d1bb99b-dedd-47db-93d8-88264c1b9039"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b197a945-2be1-406d-89af-b2972dfbeba9",
+              "leftValue": "={{ $('On form submission').item.json['Image Generator'] }}",
+              "rightValue": "Gemini",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1260,
+        440
+      ],
+      "name": "If4",
+      "id": "543b9dcf-b98e-4e85-893c-a58f32ea6897"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "30635eaf-2d09-456a-8fc5-75cb75381261",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1780,
+        40
+      ],
+      "name": "If5",
+      "id": "84cf7c30-2b33-4990-8775-55bb67e192a2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "869442a0-eccf-4873-b956-a43d854b8291",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        860,
+        380
+      ],
+      "name": "If6",
+      "id": "fbba1ea2-a0b4-4de5-b61a-cffe83682c93"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        980
+      ],
+      "name": "Google Gemini Chat Model",
+      "id": "f4ad4574-b0b2-43b9-bad4-bcdc86ebe9e4",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "89d3e132-2219-4e90-a488-212515a9d879",
+          "name": "Google my ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $node['Gemini TTI'].json.candidates[0].content.parts[0].inlineData.data }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "266ebdd0-fd2e-4786-8da2-0e28ae837851"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fc29757f-6bc4-4738-8de3-3beb2656f6ef",
+                    "leftValue": "={{ $node['Gemini TTI'].json.candidates[0].content.parts[1].inlineData.data }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9dca152b-cb4a-4008-9e6a-65c4dd1a43b2",
+                    "leftValue": "={{ $node['Gemini TTI'].json.candidates[0].content.parts[0].inlineData.data }} && {{ $node['Gemini TTI'].json.candidates[0].content.parts[1].inlineData.data }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notExists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1800,
+        700
+      ],
+      "name": "Switch5",
+      "id": "620c2a19-6236-4a18-90cd-00e2cd384da0"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Story Writer": {
+      "main": [
+        [
+          {
+            "node": "The QA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "The QA": {
+      "main": [
+        [
+          {
+            "node": "If6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Director": {
+      "main": [
+        [
+          {
+            "node": "Assistant of Assistant Organizer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cameraman": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video Editor": {
+      "main": [
+        [
+          {
+            "node": "Assistant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assistant": {
+      "main": [
+        [
+          {
+            "node": "Assistant 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assistant 2": {
+      "main": [
+        [
+          {
+            "node": "Assistant 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assistant 3": {
+      "main": [
+        [
+          {
+            "node": "Director",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Assistant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assistant of Assistant Organizer": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assistant 4": {
+      "main": [
+        [
+          {
+            "node": "Assistant 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assistant 5": {
+      "main": [
+        [
+          {
+            "node": "Assistant 6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assistant 6": {
+      "main": [
+        [
+          {
+            "node": "One Above All",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "One Above All1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Assistant 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Base64 List": {
+      "main": [
+        [
+          {
+            "node": "Generate Filename",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Filename": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Supabase": {
+      "main": [
+        [
+          {
+            "node": "Create Download URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Upload to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Download URL": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "English Voices",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Hindi Voices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hemant (Hindi)": {
+      "main": [
+        [
+          {
+            "node": "Set Base64 List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "george(English)": {
+      "main": [
+        [
+          {
+            "node": "Set Base64 List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "lisa(English)": {
+      "main": [
+        [
+          {
+            "node": "Set Base64 List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "English Voices": {
+      "main": [
+        [
+          {
+            "node": "george(English)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "lisa(English)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hindi Voices": {
+      "main": [
+        [
+          {
+            "node": "Hemant (Hindi)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "priya(Hindi)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "priya(Hindi)": {
+      "main": [
+        [
+          {
+            "node": "Set Base64 List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "English Voices1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Hindi Voices1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hindi Voices1": {
+      "main": [
+        [
+          {
+            "node": "Hemant Voice Download",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Priya Voice Download",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "English Voices1": {
+      "main": [
+        [
+          {
+            "node": "George voice download",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Lisa voice download",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "George voice download": {
+      "main": [
+        [
+          {
+            "node": "Video Editor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lisa voice download": {
+      "main": [
+        [
+          {
+            "node": "Video Editor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hemant Voice Download": {
+      "main": [
+        [
+          {
+            "node": "Video Editor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Priya Voice Download": {
+      "main": [
+        [
+          {
+            "node": "Video Editor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Story Writer1": {
+      "main": [
+        [
+          {
+            "node": "The Other QA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Story Writer1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Story Writer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "The Other QA": {
+      "main": [
+        [
+          {
+            "node": "If6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One Above All": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Cameraman1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cameraman3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cameraman1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Cameraman2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cameraman4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cameraman2": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cameraman4": {
+      "main": [
+        [
+          {
+            "node": "Generate Filename1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cameraman3": {
+      "main": [
+        [
+          {
+            "node": "Generate Filename1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cameraman5": {
+      "main": [
+        [
+          {
+            "node": "Generate Filename1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Filename1": {
+      "main": [
+        [
+          {
+            "node": "Upload to Supabase1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Supabase1": {
+      "main": [
+        [
+          {
+            "node": "Create Download URL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Download URL1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch4": {
+      "main": [
+        [
+          {
+            "node": "Story Writer5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Story Writer4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Switch4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Story Writer4": {
+      "main": [
+        [
+          {
+            "node": "The QA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Story Writer5": {
+      "main": [
+        [
+          {
+            "node": "The Other QA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Video Maker1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video Maker1": {
+      "main": [
+        [
+          {
+            "node": "Assistant 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini TTI": {
+      "main": [
+        [
+          {
+            "node": "Switch5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "base64 to img1": {
+      "main": [
+        [
+          {
+            "node": "Generate Filename1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "base64 to img": {
+      "main": [
+        [
+          {
+            "node": "Generate Filename1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One Above All1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Cameraman",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cameraman",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Cameraman",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cameraman5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If6": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Director",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Story Writer",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Story Writer1",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Story Writer4",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Story Writer5",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch5": {
+      "main": [
+        [
+          {
+            "node": "base64 to img1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "base64 to img",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "eb94bdc0-daf2-4b9c-844b-a0ceba5222b9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7ab7ff7991194668e2b3f3e7b8ac5e937735c5d9b375d5778eaaf8af314a2bb6"
+  },
+  "id": "vCXQixcqU77w0Wag",
+  "tags": []
+}
