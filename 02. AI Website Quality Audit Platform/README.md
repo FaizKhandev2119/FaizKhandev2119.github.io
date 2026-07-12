@@ -10,7 +10,6 @@
 > A highly scalable, automated exploratory testing pipeline that recursively crawls websites, detects UI/UX anomalies, and generates interactive HTML reports alongside AI-driven risk assessments.
 
 <div align="center">
-  <!-- PLACEHOLDER FOR WORKFLOW SCREENSHOT -->
   <img src="../images/website-audit.png" alt="Audit Workflow Architecture" width="100%">
   <br>
   <i>n8n Architecture: Microservice Orchestration, Parallel Processing & State Management</i>
@@ -40,6 +39,17 @@ I engineered a hybrid solution combining **n8n orchestration** with a **custom P
    - Merges the ZIP file link and the AI risk summary, emailing them directly to the user.
    - Updates the Supabase record status to `Completed`.
    - Triggers an HTTP DELETE request to the Hugging Face API to wipe the temporary screenshot folder, ensuring zero storage bloat.
+
+---
+
+## 📊 Output Previews
+
+<div align="center">
+  <img src="../images/audit-html-report.png" alt="Interactive HTML Report" width="48%">
+  <img src="../images/audit-ai-summary.png" alt="AI Generated Summary" width="48%">
+  <br>
+  <i>Left: Interactive HTML Report (Generated via n8n Code Node). Right: Structured AI Risk Assessment (Generated via Groq).</i>
+</div>
 
 ---
 
