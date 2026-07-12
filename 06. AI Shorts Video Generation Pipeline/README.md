@@ -1,4 +1,4 @@
-# 🎬 AI Shorts Video Generation Pipeline (Zero-Cost)
+# 🎬 AI Shorts Video Generation Pipeline (Zero-Cost) <a href="./AI_Shorts_Video_Generation_Pipeline.json" download><img src="https://img.shields.io/badge/⬇_Download_JSON-2ea44f?style=flat-square" alt="Download JSON"></a>
 
 ![n8n](https://img.shields.io/badge/n8n-FF6D5A?style=for-the-badge&logo=n8n&logoColor=white)
 ![Together AI](https://img.shields.io/badge/Together_AI-0F6FFF?style=for-the-badge&logo=ai&logoColor=white)
