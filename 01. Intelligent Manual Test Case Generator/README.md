@@ -1,7 +1,4 @@
-# 🧪 Intelligent Manual Test Case Generator
-<a href="./Intelligent%20Manual%20Test%20Case%20Generator.json" download>
-  <img src="https://img.shields.io/badge/📥_Download_n8n_Workflow_JSON-FF6D5A?style=for-the-badge&logo=n8n&logoColor=white" alt="Download JSON">
-</a>
+# 🧪 Intelligent Manual Test Case Generator <a href="./Intelligent%20Manual%20Test%20Case%20Generator.json" download><img src="https://img.shields.io/badge/⬇_Download_JSON-2ea44f?style=flat-square" alt="Download JSON"></a>
 
 ![n8n](https://img.shields.io/badge/n8n-FF6D5A?style=for-the-badge&logo=n8n&logoColor=white)
 ![Google Gemini](https://img.shields.io/badge/Gemini_Vision_Flash-8E75B2?style=for-the-badge&logo=google&logoColor=white)
