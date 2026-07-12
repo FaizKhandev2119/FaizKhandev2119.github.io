@@ -1,4 +1,4 @@
-# 🧠 RAG Knowledge Assistant
+# 🧠 RAG Knowledge Assistant <a href="./RAG_Knowledge_Assistant.json" download><img src="https://img.shields.io/badge/⬇_Download_JSON-2ea44f?style=flat-square" alt="Download JSON"></a>t
 
 ![n8n](https://img.shields.io/badge/n8n-FF6D5A?style=for-the-badge&logo=n8n&logoColor=white)
 ![Google Drive](https://img.shields.io/badge/Google_Drive-4285F4?style=for-the-badge&logo=googledrive&logoColor=white)
