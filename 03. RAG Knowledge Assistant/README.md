@@ -50,7 +50,7 @@ A conversational interface built to query the private data:
 
 ## 🛠️ How to Import and Use This Workflow
 
-1. Download the `workflow.json` file from this repository folder (contains both workflows).
+1. Download the `RAG_Knowledge_Assistant.json` file from this repository folder (contains both workflows).
 2. Open your n8n instance -> **Workflows** -> **Add Workflow** -> **Import from File**.
 3. **Prerequisites:**
    - A **Qdrant** cluster (Cloud or Local).
