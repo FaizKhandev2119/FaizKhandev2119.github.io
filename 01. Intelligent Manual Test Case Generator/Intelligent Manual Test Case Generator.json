@@ -1,0 +1,1319 @@
+{
+  "name": "Intelligent Manual Test Case Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "AI Powered Junior Manual Tester",
+        "formDescription": "Replace hours of manual test case writing with AI.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "What is your Name?",
+              "placeholder": "Manual Tester"
+            },
+            {
+              "fieldLabel": "Enter you valid email:",
+              "fieldType": "email",
+              "placeholder": "manualtester@xyz.com"
+            },
+            {
+              "fieldLabel": "Enter Project Name"
+            },
+            {
+              "fieldLabel": "Enter the Name of the Feature/Module",
+              "placeholder": "Login / Payment Module"
+            },
+            {
+              "fieldLabel": "How you wanna provide details?",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Enter Description Manually"
+                  },
+                  {
+                    "option": "Image"
+                  },
+                  {
+                    "option": "JIRA Ticket"
+                  },
+                  {
+                    "option": "Upload Document"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "respondWithOptions": {
+            "values": {
+              "respondWith": "redirect"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        800
+      ],
+      "name": "On form submission",
+      "id": "13d46a3c-6c99-4a2f-ba2f-e9b5a568d76c",
+      "webhookId": "99ca7075-8258-460a-b3de-f34fdbc9ff8a"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('On form submission').item.json['How you wanna provide details?'] }}",
+                    "rightValue": "Image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1caaf0d7-63b2-4b86-9220-e52772fd1e0d"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "93b0dde6-7bda-49ed-9576-fee8c5e42689",
+                    "leftValue": "={{ $('On form submission').item.json['How you wanna provide details?'] }}",
+                    "rightValue": "Enter Description Manually",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6867d44c-cc1c-4218-af20-5ebffbec7daa",
+                    "leftValue": "={{ $('On form submission').item.json['How you wanna provide details?'] }}",
+                    "rightValue": "Upload Document",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c30803c2-f577-4465-9148-bf17b1d53081",
+                    "leftValue": "={{ $('On form submission').item.json['How you wanna provide details?'] }}",
+                    "rightValue": "JIRA Ticket",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1168,
+        784
+      ],
+      "name": "Switch",
+      "id": "95b341f0-e375-4a0c-9fc2-b9215e2facb1"
+    },
+    {
+      "parameters": {
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Upload your Image for reference",
+              "fieldType": "file",
+              "multipleFiles": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        432
+      ],
+      "name": "Upload Image",
+      "id": "9386e9ae-d5be-4b43-8fd8-8ba2428ec248",
+      "webhookId": "33654a45-edc2-4b9a-8af0-20eea7d294dd"
+    },
+    {
+      "parameters": {
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Enter Description in the textbox below"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        768
+      ],
+      "name": "Enter Decription Manually",
+      "id": "fe0da9a5-0bf6-42b2-849c-c4a3d23d697c",
+      "webhookId": "230c9449-7e13-45b3-9de8-3b6ddd193cd8"
+    },
+    {
+      "parameters": {
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Attach/upload the document",
+              "fieldType": "file",
+              "multipleFiles": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        1040
+      ],
+      "name": "Upload Document",
+      "id": "84894b4a-977d-4fa7-8845-bcf30edb98d7",
+      "webhookId": "92554bb3-4383-4e4a-acc5-e9f02c56f071"
+    },
+    {
+      "parameters": {
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Emter the URL of the JIRA ticket"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        1408
+      ],
+      "name": "JIRA Ticket",
+      "id": "7d9dc569-b586-4a42-ad56-b510e44c712b",
+      "webhookId": "e46f8464-8c69-4899-878d-b7ae999241e9"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        4528,
+        736
+      ],
+      "name": "Limit",
+      "id": "f673db44-c50f-4645-a6fb-ae243bce9e60"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=AIzaSyBq_YeQYQu3Fq7iQx8JyMF9OKTEAIsFJC0",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Describe this UI in detail including all buttons, input fields, labels, layout and possible user actions.\"\n        },\n        {\n          \"inline_data\": {\n           \"mime_type\": \"image/jpeg\",\n            \"data\": \"{{ $json.image_base64 }}\"\n          }\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2272,
+        432
+      ],
+      "name": "The Visual Decoder",
+      "id": "0c15164f-063c-4614-b10c-c4301520b6c1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Description }}",
+        "options": {
+          "systemMessage": "=You are a Senior QA Engineer.\n\nBased on the following UI description, Generate highly detailed, non-generic manual test cases.\n\nUI Description:\n{{ $json.Description }}\n\nIMPORTANT:\n- Do not assume behavior — write test cases to validate it\n- Cover interdependencies between UI elements\n- Include state changes (enable/disable, selection sync)\n- Include edge cases and failure scenarios\n- Avoid vague statements like \"UI looks good\"\n\nFocus on:\n- Functional logic\n- UI behavior\n- Data consistency\n- Edge cases\n- Negative scenarios\n\nReturn ONLY valid JSON.\nDo NOT include:\n- explanations\n- introductions\n- notes\n- markdown\n- extra text\n\nOutput format:\n\n[\n  {\n    \"id\": \"\",\n    \"title\": \"\",\n    \"severity\": \"\",\n    \"priority\": \"\",\n    \"type\": \"\",\n    \"preconditions\": \"\",\n    \"steps\": \"\",\n    \"expected\": \"\"\n  }\n]"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        3792,
+        736
+      ],
+      "name": "Junior QA",
+      "id": "138b26e1-bcde-4310-bb85-b8217f572261"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3-flash-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        3808,
+        928
+      ],
+      "name": "Brain of Junior QA",
+      "id": "b6dccfec-d5bb-46a3-aa1a-6de729d81535",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "03KTD9fBH3ZZEAwf",
+          "name": "fkpathan88@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.output;\nconst cleaned = raw.replace(/```json|```/g, '').trim();\nconst data = JSON.parse(cleaned);\n\nreturn data.map(tc => ({\n  json: {\n    ID: tc.id,\n    Title: tc.title,\n    Type: tc.type,\n    Priority: tc.priority,\n    Severity: tc.severity,\n    Preconditions: tc.preconditions,\n    \n    // 👇 FIX HERE\n    Steps: Array.isArray(tc.steps) \n      ? tc.steps.join('\\n') \n      : tc.steps,\n\n    Expected: tc.expected\n    \n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4128,
+        736
+      ],
+      "name": "Beautifier",
+      "id": "c4d05019-db77-41ea-8dbc-0c3c83d0efa8"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "={{ $('On form submission').item.json['Enter Project Name'] }}",
+        "sheetsUi": {
+          "sheetValues": [
+            {
+              "title": "={{ $('On form submission').item.json['Enter the Name of the Feature/Module'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        848,
+        800
+      ],
+      "name": "Create Spreadsheet for Project",
+      "id": "f7b1c181-876c-4789-9640-c4157495d4ae",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "I7OIVhXwXj0eiaHh",
+          "name": "1990.faizkhan@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create Spreadsheet for Project').first().json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Create Spreadsheet for Project').first().json.sheets[0].properties.sheetId }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        4352,
+        736
+      ],
+      "name": "Add Test Cases in Project Spreadsheet",
+      "id": "1815b46b-cf2a-4e6b-82af-a73fce82db39",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "I7OIVhXwXj0eiaHh",
+          "name": "1990.faizkhan@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Create Spreadsheet for Project').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "writer",
+            "type": "user",
+            "emailAddress": "={{ $('On form submission').item.json['Enter you valid email:'] }}"
+          }
+        },
+        "options": {
+          "emailMessage": "=Hi {{ $('On form submission').item.json['What is your Name?'] }},\n\nYour test cases for {{ $('On form submission').item.json['Enter Project Name'] }} - {{ $('On form submission').item.json['Enter the Name of the Feature/Module'] }} have been successfully generated based on the provided input.\n\nYou can access your spreadsheet using the link below:\nhttps://docs.google.com/spreadsheets/d/{{ $('Create Spreadsheet for Project').item.json.spreadsheetId }}\n\nThe document contains all the test cases organized in a structured format for your feature.\n\nIf you need any modifications or additional test scenarios, feel free to reach out.\n\nThanks,\nQA Automation System"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4688,
+        736
+      ],
+      "name": "Share Test Cases with client",
+      "id": "1016bb87-36bd-4a00-9c26-84094d8e5a14",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "FvFS7an4iuPbv0Xf",
+          "name": "1990.faizkhan@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/files",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer D466Iz65q2TjarqEZWNpukzUNozTLjvd"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "purpose",
+              "value": "ocr"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "Attach_upload_the_document"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1904,
+        1040
+      ],
+      "name": "Upload To Mistral",
+      "id": "60c344da-e2fd-4bec-a922-2886ba945836"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.mistral.ai/v1/files/{{ $json.id }}/url",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "expiry",
+              "value": "24"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer D466Iz65q2TjarqEZWNpukzUNozTLjvd"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2080,
+        1040
+      ],
+      "name": "Get File URL",
+      "id": "3c9e6be9-7728-4c76-a29d-c48b4d092e39"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/ocr",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer D466Iz65q2TjarqEZWNpukzUNozTLjvd"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"mistral-ocr-latest\",\n  \"document\": {\n    \"type\": \"document_url\",\n    \"document_url\": \"{{ $json.url }}\"\n  },\n  \"include_image_base64\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2272,
+        1040
+      ],
+      "name": "OCR",
+      "id": "2dd93e26-20be-481c-aa87-43dd25ea084c"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "issueKey": "={{ $json.issueKey }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        1408
+      ],
+      "name": "Jira Software1",
+      "id": "9439999b-3c1d-444e-a426-c498614b8519",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "JcoHo8j81aDDnJyN",
+          "name": "Jira SW Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const url = $input.first().json['Emter the URL of the JIRA ticket'];\n\nif (!url) {\n  throw new Error(\"JIRA URL not found\");\n}\n\nconst match = url.toUpperCase().match(/([A-Z]+-\\d+)/);\n\nif (!match) {\n  throw new Error(\"Invalid JIRA URL\");\n}\n\nreturn [\n  {\n    json: {\n      issueKey: match[1]\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1840,
+        1408
+      ],
+      "name": "Code1",
+      "id": "370df110-1850-4345-ae7f-ee71da55d791"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "da5cd84e-628e-47a3-9353-625dd667c38e",
+              "leftValue": "={{ $json.hasImages }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2464,
+        1440
+      ],
+      "name": "If",
+      "id": "5f0e218c-1678-41f8-8c18-8be9f1064742"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nconst description = item.fields.description || \"\";\nconst attachments = item.fields.attachment || [];\n\n// Sirf images filter karo\nconst images = attachments.filter(att =>\n  att.mimeType && att.mimeType.startsWith(\"image/\")\n);\n\nreturn [\n  {\n    json: {\n      description,\n      hasImages: images.length > 0,\n      images\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2192,
+        1408
+      ],
+      "name": "Code3",
+      "id": "2c01fa3c-a030-4cd8-b4e1-ccd6d77a99df"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3040,
+        1664
+      ],
+      "name": "Loop Over Items",
+      "id": "c7a680b3-9d0b-4026-a922-d7634e55c8bf"
+    },
+    {
+      "parameters": {
+        "content": "## Create a Google Spreadsheet With Project Name and a sheet with Feature Name\n\n",
+        "height": 400,
+        "width": 260
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        768,
+        592
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note",
+      "id": "57c73a3f-9f80-4a08-a09e-a5d1815b477a"
+    },
+    {
+      "parameters": {
+        "content": "## Ask the user to Upload an Image/screenshot of the UI, and convert the Image to base64 and analyse the Image using AI vision and create a Description.\n",
+        "height": 320,
+        "width": 1080,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1552,
+        304
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note1",
+      "id": "ce3cde90-09b4-4d75-92ec-0b346c6c0940"
+    },
+    {
+      "parameters": {
+        "content": "## Ask the user to enter description of the feature manually.\n",
+        "height": 260,
+        "width": 1080,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1552,
+        672
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note2",
+      "id": "afe78f8d-4e31-4de4-9656-6bca0e2e8a0e"
+    },
+    {
+      "parameters": {
+        "content": "## Ask the user to upload a document (pdf/word), use OCR capabilities from Mistral AI and create a description\n",
+        "height": 280,
+        "width": 1080,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1552,
+        960
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note3",
+      "id": "3f795c39-e209-4c31-933f-98c3593bdcf5"
+    },
+    {
+      "parameters": {
+        "content": "## Ask the user to enter JIRA Ticket Link, Extract the Issue Number, extract the details of the JIRA Ticket.\n",
+        "height": 300,
+        "width": 820,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1552,
+        1264
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note4",
+      "id": "2a3f8889-f430-4e08-a021-6131bfbe9ccb"
+    },
+    {
+      "parameters": {
+        "content": "True - If JIRA ticket does not have Images - Create description.\n\nFalse - If JIRA ticket includes Images - analyse images\n",
+        "height": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2384,
+        1264
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note5",
+      "id": "65901f6e-6086-4358-9e28-b4b7c80bc4f0"
+    },
+    {
+      "parameters": {
+        "content": "## Download each image, convert them into base64, analyse each image using AI vision, merge the description from JIRA ticket and the analysis of the images done by AI and create a final description.",
+        "height": 600,
+        "width": 1060,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2768,
+        1424
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note6",
+      "id": "0f99d839-b59a-4ed7-a412-c38305840f42"
+    },
+    {
+      "parameters": {
+        "content": "## Switch Node to handle :\n- Image/Screenshot upload\n- Manual description\n- Document Upload\n- Jira Ticket link\n",
+        "height": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1056,
+        592
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note7",
+      "id": "9a14c9fd-6c4c-4e6d-ae7b-ed3f57c62de4"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "images",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2816,
+        1664
+      ],
+      "name": "Split Out each Image",
+      "id": "7446a4aa-357a-4f78-8493-f5d43fb8ca43"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.content }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {
+          "response": {
+            "response": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3248,
+        1760
+      ],
+      "name": "Download Image",
+      "id": "c6b2b0a6-4fb0-42bb-813e-c4330b359901",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "8P0rpFv3Gr0o2zLE",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst results = await Promise.all(\n  items.map(async (item, index) => {\n\n    if (!item.binary) {\n      throw new Error(\"No binary data found\");\n    }\n\n    const binaryKey = Object.keys(item.binary)[0];\n\n    // Read actual file buffer from filesystem storage\n    const buffer = await this.helpers.getBinaryDataBuffer(\n      index,\n      binaryKey\n    );\n\n    return {\n      json: {\n        image_base64: buffer.toString('base64'),\n        mime_type: item.binary[binaryKey].mimeType,\n        file_name: item.binary[binaryKey].fileName\n      }\n    };\n  })\n);\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3456,
+        1760
+      ],
+      "name": "Image to base65",
+      "id": "109d4eef-e98a-4c05-980e-af45096f3b0a"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=AIzaSyBq_YeQYQu3Fq7iQx8JyMF9OKTEAIsFJC0",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Describe this UI in detail including all buttons, input fields, labels, layout and possible user actions.\"\n        },\n        {\n          \"inline_data\": {\n           \"mime_type\": \"image/jpeg\",\n            \"data\": \"{{ $json.image_base64 }}\"\n          }\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3648,
+        1760
+      ],
+      "name": "AI vision",
+      "id": "87e17453-07cd-443c-8c74-7f7bca9f5597"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: items (3 items from loop done branch)\n\nlet finalText = \"\";\n\nitems.forEach((item, index) => {\n  const text = item.json.candidates?.[0]?.content?.parts?.[0]?.text || \"\";\n\n  finalText += `\\n\\n====================\\n`;\n  finalText += `Image ${index + 1} Description:\\n`;\n  finalText += `====================\\n`;\n  finalText += text;\n});\n\nreturn [\n  {\n    json: {\n      mergedDescription: finalText\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3248,
+        1552
+      ],
+      "name": "Merge Image descriptions",
+      "id": "5d94b15b-7b7a-4ed0-aca1-5957ed9dfc89"
+    },
+    {
+      "parameters": {
+        "jsCode": "// JIRA description\nconst jiraDesc =  $('Jira Software1').first().json.fields.description || \"\";\n\n// Image descriptions (merged wala output)\nconst imageDesc =$input.first().json.mergedDescription  || \"\";\n\n// Final formatted description\nconst description = `\n========================\n📝 JIRA DESCRIPTION\n========================\n${jiraDesc}\n\n========================\n🖼️ IMAGE ANALYSIS\n========================\n${imageDesc}\n\n========================\n✅ FINAL SUMMARY\n========================\nThe above descriptions include both the original JIRA issue details and AI-generated analysis of attached images. Please review for complete context.\n`;\n\nreturn [\n  {\n    json: {\n      description\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3472,
+        1552
+      ],
+      "name": "Merge JIRA description + Images description",
+      "id": "a656e330-5631-4aa9-8a08-2b13afed4456"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.item;\nlet description = \"\";\n\n// Case 1: Image (Gemini / Vision output)\nif (item.json?.candidates?.[0]?.content?.parts?.[0]?.text) {\n  description = item.json.candidates[0].content.parts[0].text;\n}\n\n// Case 2: Manual Form Input\nelse if (item.json?.[\"Enter Description in the textbox below\"]) {\n  description = item.json[\"Enter Description in the textbox below\"];\n}\n\n// Case 3: OCR Output (markdown)\nelse if ($input.first()?.json?.pages?.[0]?.markdown) {\n  description = $input.first().json.pages[0].markdown;\n}\n\n// Case 4: Generic fallback\nelse if (item.json?.description) {\n  description = item.json.description;\n}\n\n// Case 5: Safety fallback\nelse {\n  throw new Error(\"No valid description found from input source\");\n}\n\nreturn [\n  {\n    json: {\n      Description: description.trim()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3568,
+        736
+      ],
+      "name": "Handle Descriptions from all branches",
+      "id": "d446c398-f353-4636-b309-ce9b689f6ad3"
+    },
+    {
+      "parameters": {
+        "content": "## Takes the description, Passes it to the Junior QA, The Junior QA reviews and Prepares the Functional, UI, UX MANUAL TEST CASES based on the description. Then the test cases are added in the Project Spreadsheet, and the Project Spreadsheet is shared with the user via email.\n",
+        "height": 620,
+        "width": 1460
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3472,
+        480
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note8",
+      "id": "48fa0c7c-dcf9-44d3-97b0-cc9bda50c3ba"
+    },
+    {
+      "parameters": {
+        "content": "Intelligent Manual Test Case Generator",
+        "height": 1836,
+        "width": 4472,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        512,
+        208
+      ],
+      "typeVersion": 1,
+      "name": "Sticky Note9",
+      "id": "a3d9b34b-2758-468b-8f4a-3f46b87d0f00"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e0e631c6-5b7d-429e-b55a-0df32cdc178b",
+              "name": "description",
+              "value": "={{ $json.pages.map(p => p.markdown).join('\\n\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2448,
+        1040
+      ],
+      "name": "Edit Fields",
+      "id": "b1c475d0-f49c-4165-9755-6a292ed064c5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst results = await Promise.all(\n  items.map(async (item, index) => {\n\n    if (!item.binary) {\n      throw new Error(\"No binary data found\");\n    }\n\n    const binaryKey = Object.keys(item.binary)[0];\n\n    // Read actual file buffer from filesystem storage\n    const buffer = await this.helpers.getBinaryDataBuffer(\n      index,\n      binaryKey\n    );\n\n    return {\n      json: {\n        image_base64: buffer.toString('base64'),\n        mime_type: item.binary[binaryKey].mimeType,\n        file_name: item.binary[binaryKey].fileName\n      }\n    };\n  })\n);\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        432
+      ],
+      "name": "Image to base",
+      "id": "c7b0260f-6af7-400d-8f38-288db64f83e6"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Create Spreadsheet for Project",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Upload Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enter Decription Manually",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload Document",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "JIRA Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Image": {
+      "main": [
+        [
+          {
+            "node": "Image to base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Share Test Cases with client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "The Visual Decoder": {
+      "main": [
+        [
+          {
+            "node": "Handle Descriptions from all branches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Junior QA": {
+      "main": [
+        [
+          {
+            "node": "Beautifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brain of Junior QA": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Junior QA",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Beautifier": {
+      "main": [
+        [
+          {
+            "node": "Add Test Cases in Project Spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Spreadsheet for Project": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Test Cases in Project Spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enter Decription Manually": {
+      "main": [
+        [
+          {
+            "node": "Handle Descriptions from all branches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload To Mistral": {
+      "main": [
+        [
+          {
+            "node": "Get File URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get File URL": {
+      "main": [
+        [
+          {
+            "node": "OCR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Document": {
+      "main": [
+        [
+          {
+            "node": "Upload To Mistral",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OCR": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JIRA Ticket": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Jira Software1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira Software1": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Handle Descriptions from all branches",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split Out each Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Merge Image descriptions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out each Image": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image": {
+      "main": [
+        [
+          {
+            "node": "Image to base65",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image to base65": {
+      "main": [
+        [
+          {
+            "node": "AI vision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI vision": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Image descriptions": {
+      "main": [
+        [
+          {
+            "node": "Merge JIRA description + Images description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge JIRA description + Images description": {
+      "main": [
+        [
+          {
+            "node": "Handle Descriptions from all branches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Descriptions from all branches": {
+      "main": [
+        [
+          {
+            "node": "Junior QA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Handle Descriptions from all branches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image to base": {
+      "main": [
+        [
+          {
+            "node": "The Visual Decoder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "37b74a10-eee3-415c-9e32-689143bf75f6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0cf0dc80c3169b41c4db0feb12776101bd90001bb95a998560efa2765e00d7a1"
+  },
+  "nodeGroups": [],
+  "id": "CLgcnngXPyoF9q9N",
+  "tags": []
+}
