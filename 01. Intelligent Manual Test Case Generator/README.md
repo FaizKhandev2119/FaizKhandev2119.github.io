@@ -1,61 +1,56 @@
 # 🧪 Intelligent Manual Test Case Generator
 
 ![n8n](https://img.shields.io/badge/n8n-FF6D5A?style=for-the-badge&logo=n8n&logoColor=white)
-![Google Gemini](https://img.shields.io/badge/Gemini_Vision-8E75B2?style=for-the-badge&logo=google&logoColor=white)
+![Google Gemini](https://img.shields.io/badge/Gemini_Vision_Flash-8E75B2?style=for-the-badge&logo=google&logoColor=white)
 ![Mistral OCR](https://img.shields.io/badge/Mistral_OCR-F55036?style=for-the-badge&logo=mistral&logoColor=white)
-![Google Workspace](https://img.shields.io/badge/Google_Sheets_%26_Gmail-34A853?style=for-the-badge&logo=googlesheets&logoColor=white)
+![Jira](https://img.shields.io/badge/Jira_Software-0052CC?style=for-the-badge&logo=jira&logoColor=white)
+![Google Workspace](https://img.shields.io/badge/Google_Sheets_%26_Drive-34A853?style=for-the-badge&logo=googlesheets&logoColor=white)
 
-> An intelligent n8n workflow that completely automates the creation of manual test cases by analyzing Jira tickets, screenshots, and PRDs using Vision AI and LLMs.
+> An advanced, multi-modal n8n workflow that acts as an AI QA Assistant. It dynamically processes User Inputs, Documents, UI Screenshots, and Jira tickets to auto-generate structured manual test cases and deliver them directly to the user.
 
 <div align="center">
-  <!-- PLACEHOLDER FOR WORKFLOW SCREENSHOT -->
-  <img src="../images/testcase-generator.png" alt="Workflow Architecture" width="90%">
+  <img src="../images/testcase-generator.png" alt="Workflow Architecture" width="100%">
   <br>
-  <i>n8n Workflow Architecture</i>
+  <i>n8n Workflow Architecture: Complex branching and Multimodal AI processing</i>
 </div>
 
 ---
 
 ## 🚨 The Problem
-Writing comprehensive manual test cases is one of the most time-consuming aspects of the QA lifecycle. QA engineers spend hours reading Jira tickets, extracting requirements, and structuring positive, negative, and edge test cases manually into spreadsheets. This process is highly repetitive, prone to human error, and delays the actual testing phase.
+Writing manual test cases requires QA engineers to extract context from various scattered sources—reading Jira descriptions, analyzing UI mockups, or parsing PRDs. Consolidating this diverse data into structured test cases (Positive, Negative, Edge) is highly manual, repetitive, and time-consuming.
 
-## 💡 The AI Solution
-I designed a completely automated **n8n pipeline** that acts as an AI QA Assistant. It takes multiple forms of inputs (Jira tickets, PRD documents, or UI screenshots) and transforms them into highly structured, ready-to-use test cases in minutes.
+## 💡 The AI Solution (Workflow Architecture)
+I designed a completely automated, end-to-end **n8n pipeline** that standardizes test case creation regardless of the input format. 
 
-### ⚡ Key Features
-- **Multimodal Input Processing:** Uses **Gemini Vision** to understand UI mockups/screenshots and **Mistral OCR** for text extraction from documents.
-- **Jira Integration:** Automatically fetches requirements from Jira Epics and Stories via REST APIs.
-- **Comprehensive Coverage:** Instructs the LLM to generate Positive, Negative, Functional, Edge, and Validation test cases.
-- **Automated Delivery:** Automatically creates a structured Google Sheet (mapping Severity, Priority, Preconditions, Steps, Expected Results) and emails it to the stakeholders.
+### 🔄 How It Works (Step-by-Step)
+1. **The Trigger (User Intake):** The workflow begins with an **n8n Form Trigger** where the user inputs their Name, Email, and selects the input format (Text, Docs, Screenshot, or Jira URL).
+2. **Dynamic Routing (Switch Node):** Based on the selected input, the workflow routes the data to specific processing branches:
+   * **Text:** Directly passed to the AI.
+   * **Docs (PDF/Word):** Sent to **Mistral AI** for OCR and text extraction.
+   * **UI Screenshots:** Converted to Base64 and sent to **Gemini Vision (1.5 Flash)** with a specific "Tester Persona" prompt to extract every functional UI detail.
+   * **Jira Integration:** Extracts the ticket description. *Crucially, if the ticket contains image attachments, it loops through each image, processes it with Gemini Vision, and merges the visual context with the text description.*
+3. **The AI Agent (Brain of Junior QA):** All processed context converges into an AI Agent node. The Agent is instructed to generate comprehensive test cases covering Positive, Negative, Functional, and Edge scenarios.
+4. **Structured Output & Delivery:** 
+   * The AI formats the output into specific data points: `Test Case ID`, `Severity`, `Priority`, `Pre-condition`, `Steps`, and `Expected Result`.
+   * The workflow dynamically creates a new **Google Spreadsheet**, populates it with these columns, and shares the file directly with the user via the email provided in the initial form.
 
 ---
 
-## ⚙️ n8n Nodes & Tech Stack Used
+## ⚙️ Key n8n Nodes & Logic Handled
 
-| Node / Technology | Purpose in Workflow |
+| Node / Logic | Purpose in Workflow |
 | :--- | :--- |
-| **Webhook / HTTP Request** | To trigger the workflow and fetch Jira ticket data via Jira REST API. |
-| **Google Gemini (Vision)** | To analyze UI mockups and extract visual testing requirements. |
-| **Mistral OCR** | To parse and extract text from attached PDF requirements or documents. |
-| **Code Node (JavaScript)** | To parse the LLM's JSON output and structure the data into an array of items for iteration. |
-| **Google Sheets Node** | To dynamically create a new spreadsheet and append the generated test cases row by row. |
-| **Gmail Node** | To notify the QA team and stakeholders with the link to the generated Google Sheet. |
-
----
-
-## 📈 Business Impact
-- **Time Saved:** Reduced manual test design time by **75%**.
-- **Efficiency:** Saved approximately **15+ hours per week** for the QA team, allowing them to focus on actual exploratory testing rather than documentation.
+| **n8n Form Trigger** | To capture user details and dynamic input types. |
+| **Switch & If Nodes** | To route workflows based on input type and check for Jira attachments. |
+| **Loop Node** | To iterate through multiple images attached to a single Jira ticket. |
+| **Advanced AI Agent** | To process massive context limits and structure the final QA output. |
+| **Google Drive/Sheets Nodes** | To automate file creation, data insertion, and permission sharing. |
 
 ---
 
 ## 🛠️ How to Import and Use This Workflow
 
-1. **Download the JSON:** Download the `workflow.json` file from this repository folder.
-2. **Import into n8n:** 
-   - Open your n8n instance.
-   - Go to **Workflows** -> **Add Workflow**.
-   - Click the `...` menu in the top right -> **Import from File**.
-   - Select the downloaded `workflow.json` file.
-3. **Configure Credentials:**
-   - You will need to add your own credentials for **Google Workspace (Sheets/Gmail)**, **Gemini API**, and **Jira API** to run this successfully.
+1. Download the `workflow.json` file from this repository folder.
+2. Open your n8n instance -> **Workflows** -> **Add Workflow**.
+3. Click the `...` menu in the top right -> **Import from File**.
+4. Configure your credentials for **Google Workspace**, **Mistral AI**, **Gemini API**, and **Jira Software**.
