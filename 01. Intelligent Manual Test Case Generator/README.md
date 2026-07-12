@@ -27,7 +27,7 @@ I designed a completely automated, end-to-end **n8n pipeline** that standardizes
 2. **Dynamic Routing (Switch Node):** Based on the selected input, the workflow routes the data to specific processing branches:
    * **Text:** Directly passed to the AI.
    * **Docs (PDF/Word):** Sent to **Mistral AI** for OCR and text extraction.
-   * **UI Screenshots:** Converted to Base64 and sent to **Gemini Vision (1.5 Flash)** with a specific "Tester Persona" prompt to extract every functional UI detail.
+   * **UI Screenshots:** Converted to Base64 and sent to **Gemini Vision (3.0 Flash)** with a specific "Tester Persona" prompt to extract every functional UI detail.
    * **Jira Integration:** Extracts the ticket description. *Crucially, if the ticket contains image attachments, it loops through each image, processes it with Gemini Vision, and merges the visual context with the text description.*
 3. **The AI Agent (Brain of Junior QA):** All processed context converges into an AI Agent node. The Agent is instructed to generate comprehensive test cases covering Positive, Negative, Functional, and Edge scenarios.
 4. **Structured Output & Delivery:** 
@@ -50,7 +50,7 @@ I designed a completely automated, end-to-end **n8n pipeline** that standardizes
 
 ## 🛠️ How to Import and Use This Workflow
 
-1. Download the `workflow.json` file from this repository folder.
+1. Download the `Intelligent Manual Test Case Generator.json` file from this repository folder.
 2. Open your n8n instance -> **Workflows** -> **Add Workflow**.
 3. Click the `...` menu in the top right -> **Import from File**.
 4. Configure your credentials for **Google Workspace**, **Mistral AI**, **Gemini API**, and **Jira Software**.
