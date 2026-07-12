@@ -1,5 +1,13 @@
 <div align="center">
+  <!-- MASTER PORTFOLIO BANNER -->
   <img src="./images/portfolio-banner.png" alt="Faiz Khan Portfolio Banner" width="100%">
+  
+  <br><br>
+  
+  <!-- DOWNLOAD RESUME BUTTON -->
+  <a href="./Faiz_Khan_Resume.pdf" target="_blank">
+    <img src="https://img.shields.io/badge/📄_Download_My_Resume-0A66C2?style=for-the-badge&logo=google-docs&logoColor=white" alt="Download Resume">
+  </a>
 </div>
 
 ---
