@@ -121,8 +121,8 @@
 
 I am actively looking for opportunities in **AI Workflow Automation, QA Architecture, and Intelligent Agent Development**.
 
-* **LinkedIn:** [linkedin.com/in/your-username](https://linkedin.com/in/your-username)
-* **Email:** [your.email@example.com](mailto:your.email@example.com)
+* **LinkedIn:** https://www.linkedin.com/in/faiz-khan-8a2b36228/
+* **Email:** mailto:1990.faizkhan@gmail.com
 * **Portfolio Website:** [FaizKhandev2119.github.io](https://FaizKhandev2119.github.io)
 
 ---
